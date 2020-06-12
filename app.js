@@ -1,7 +1,7 @@
 import 'babel-polyfill';
-import config from './src/api/config/config';
-import app from './src/api/config/express';
-import db from './src/api/config/sequelize';
+import config from './src/app/config/config';
+import app from './src/app/config/express';
+import db from './src/app/config/sequelize';
 
 const debug = require('debug')('express-postgresql-sequelize-es6-rest-api:index');
 
