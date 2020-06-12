@@ -10,9 +10,9 @@ function buildQuery(model, requestQuery) {
     
     let nestedModels = getNestedModels(model);
 
-    let query = buildWhereQuery(requestQuery.filter, model, nestedModels);
+    let query = buildWhere(requestQuery.filter, model, nestedModels);
     query = { ...query, ...buildProjections(requestQuery.projection) };
-    query = { ...query, ...buildIncludes(requestQuery, model, model) };
+    query = { ...query, ...buildIncludes(requestQuery, model) };
     //query = { ...query, ...buildAggregations(requestQuery) };
     query = { ...query, ...buildGroupBy(requestQuery.groupBy, model, nestedModels) };
     query = { ...query, ...buildOrder(requestQuery.sort, model, nestedModels) };
@@ -25,7 +25,7 @@ function buildQuery(model, requestQuery) {
     return query;
 }
 
-function buildIncludes(requestQuery, model, originalModel, query = {}) {
+function buildIncludes(requestQuery, model, originalModel = model, query = {}) {
     if (model.associations) {
         Object.keys(model.associations).forEach((key) => {
             if (model.associations[key].target) {
@@ -39,11 +39,12 @@ function buildIncludes(requestQuery, model, originalModel, query = {}) {
 
                 query.include.push(associationInclude);
 
-                if (!originalModel || (model.associations[key].target.name !== originalModel.name)) {
+                if (model.associations[key].target.name !== originalModel.name) {
                     let currentJoin = query.include[query.include.length - 1];    
-                    let childJoin = buildIncludes(requestQuery, model.associations[key].target, model, currentJoin);
-                                    
-                    query.include[query.include.length - 1] = { ...currentJoin, ...childJoin };
+                    let childJoin = buildIncludes(requestQuery, model.associations[key].target, originalModel, currentJoin);
+                    let lastIndex = query.include.length - 1;
+                    
+                    query.include[lastIndex] = { ...currentJoin, ...childJoin };
                 }
             }
         });
@@ -118,7 +119,7 @@ function buildOrder(sort, model, nestedModels) {
     return query;
 }
 
-function buildWhereQuery(filter, model, nestedModels) {
+function buildWhere(filter, model, nestedModels) {
     let currentExpression = queryParser.parseFilterExpressions(filter);
     let query = {};
     

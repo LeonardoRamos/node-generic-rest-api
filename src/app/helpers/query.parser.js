@@ -123,13 +123,13 @@ function parseFilterExpressions(expressionString) {
     
     for (let i = 0; expressionString && i < expressionString.length; i++) {
         
-        if (expressionString.charAt(i) != '_') {
+        if (expressionString.charAt(i) !== '_') {
             word += expressionString.charAt(i);
             
         } else {
             let logicOperator = processOperator(expressionString, i);
 
-            if (logicOperator != null) {
+            if (logicOperator !== null) {
                 currentExpression.logicOperator = logicOperator;
                 currentExpression.filterField = parseFilterField(word.trim());
                 currentExpression = processNewExpressionNode(currentExpression);
@@ -152,7 +152,7 @@ function parseFilterExpressions(expressionString) {
 function parseFilterField(logicExpression) {
     let filterField = {};
     
-    if (logicExpression == null || '' === logicExpression) {
+    if (logicExpression === null || '' === logicExpression) {
         return null;
     }
     
@@ -187,11 +187,11 @@ function getComparisonOperator(logicExpression, index) {
         operation += logicExpression.charAt(index);
         index++;
         
-        if (index >= logicExpression.length || logicExpression.charAt(index) == '|') {
+        if (index >= logicExpression.length || logicExpression.charAt(index) === '|') {
             
             appendOperation = false;
             
-            if (index < logicExpression.length && logicExpression.charAt(index) == '|') {
+            if (index < logicExpression.length && logicExpression.charAt(index) === '|') {
                 operation += logicExpression.charAt(index);
             }
         }
@@ -218,11 +218,11 @@ function processOperator(expressionString, index) {
         logicOperatorText += expressionString.charAt(index);
         index++;
         
-        if (index >= expressionString.length || expressionString.charAt(index) == '_') {
+        if (index >= expressionString.length || expressionString.charAt(index) === '_') {
             
             appendOperation = false;
             
-            if (index < expressionString.length && expressionString.charAt(index) == '_') {
+            if (index < expressionString.length && expressionString.charAt(index) === '_') {
                 logicOperatorText += expressionString.charAt(index);
             }
         }
