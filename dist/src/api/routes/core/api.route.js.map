@@ -1,0 +1,1 @@
+{"version":3,"sources":["src/api/routes/core/api.route.js"],"names":["router","express","Router","use","userRoutes"],"mappings":";;;;;;AAAA;;;;AACA;;;;;;AAEA,IAAMA,SAASC,kBAAQC,MAAR,EAAf;;AAEAF,OAAOG,GAAP,CAAW,QAAX,EAAqBC,cAArB;;kBAEeJ,M","file":"api.route.js","sourceRoot":"../../../../../../../../.."}
