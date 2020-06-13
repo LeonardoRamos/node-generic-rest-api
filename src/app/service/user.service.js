@@ -7,6 +7,9 @@ module.exports = class UserService extends ApiRestService {
     
     constructor() {
         super(User);
+
+        this.save = this.save.bind(this);
+        this.update = this.update.bind(this);
     }
 
     async findByEmail(email) {

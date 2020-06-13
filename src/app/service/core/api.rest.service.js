@@ -24,6 +24,8 @@ module.exports = class ApiRestService {
         let query = queryBuilder.buildQuery(this.model, req.query);
         let result = await this.model.findAndCountAll(query)
 
+        console.log(result);
+
         return {
             records: result.rows,
             metadata: {

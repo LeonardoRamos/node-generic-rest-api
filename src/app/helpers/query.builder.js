@@ -9,23 +9,30 @@ function buildQuery(model, requestQuery) {
     requestQuery = queryParser.parseRequestSymbols(requestQuery);
     
     let nestedModels = getNestedModels(model);
-
     let query = buildWhere(requestQuery.filter, model, nestedModels);
-    query = { ...query, ...buildProjections(requestQuery.projection) };
+    
+    if (queryParser.hasValidAggregateFunction(requestQuery)) {
+        query = { ...query, ...buildAggregations(requestQuery, model, nestedModels) };
+        query = { ...query, ...buildGroupBy(requestQuery.groupBy, model, nestedModels) };
+
+    } else {
+        query = { ...query, ...buildProjections(requestQuery.projection) };
+    }
+    
     query = { ...query, ...buildIncludes(requestQuery, model) };
-    //query = { ...query, ...buildAggregations(requestQuery) };
-    query = { ...query, ...buildGroupBy(requestQuery.groupBy, model, nestedModels) };
-    query = { ...query, ...buildOrder(requestQuery.sort, model, nestedModels) };
+    query = { ...query, ...buildOrder(requestQuery.sort, nestedModels, model) };
     
     query.limit = queryParser.getLimit(requestQuery);
     query.offset = queryParser.getOffset(requestQuery);
 
-    console.log(query);
+    query.raw = true;  
+    query.mapToModel = true;
+    query.nest = true;
 
     return query;
 }
 
-function buildIncludes(requestQuery, model, originalModel = model, query = {}) {
+function buildIncludes(requestQuery, model, rootModel = model, query = {}) {
     if (model.associations) {
         Object.keys(model.associations).forEach((key) => {
             if (model.associations[key].target) {
@@ -35,13 +42,19 @@ function buildIncludes(requestQuery, model, originalModel = model, query = {}) {
                     model: model.associations[key].target,
                     as: key,
                 };
-                associationInclude = { ...associationInclude, ...buildProjections(requestQuery.projection, key) };
+
+                if (queryParser.hasValidAggregateFunction(requestQuery)) {
+                    associationInclude.attributes = [];
+
+                } else {
+                    associationInclude = { ...associationInclude, ...buildProjections(requestQuery.projection, key) };
+                }
 
                 query.include.push(associationInclude);
 
-                if (model.associations[key].target.name !== originalModel.name) {
+                if (model.associations[key].target.name !== rootModel.name) {
                     let currentJoin = query.include[query.include.length - 1];    
-                    let childJoin = buildIncludes(requestQuery, model.associations[key].target, originalModel, currentJoin);
+                    let childJoin = buildIncludes(requestQuery, model.associations[key].target, rootModel, currentJoin);
                     let lastIndex = query.include.length - 1;
                     
                     query.include[lastIndex] = { ...currentJoin, ...childJoin };
@@ -51,6 +64,59 @@ function buildIncludes(requestQuery, model, originalModel = model, query = {}) {
     }
 
     return query;
+}
+
+function buildAggregations(requestQuery, model, nestedModels) {
+    let sum = queryParser.parseSeletor(requestQuery.sum);
+    let avg = queryParser.parseSeletor(requestQuery.avg);
+    let count = queryParser.parseSeletor(requestQuery.count);
+    let countDistinct = queryParser.parseSeletor(requestQuery.countDistinct);
+    let groupBy = queryParser.parseSeletor(requestQuery.groupBy);
+    
+    let query = {};
+
+    if (sum.length === 0 && avg.length === 0 && count.length === 0 
+            && countDistinct.length === 0 && groupBy.length === 0) {
+
+        return query;
+    }
+
+    let aggregation = buildFunctionProjection(sum, 'sum', model, nestedModels);
+    aggregation = aggregation.concat(buildFunctionProjection(avg, 'avg', model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(count, 'count', model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(countDistinct, 'countDistinct', model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(groupBy, 'groupBy', model, nestedModels));
+
+    query.attributes = aggregation;
+
+    return query;
+}
+
+function buildFunctionProjection(functionFields, sqlFunction, model, nestedModels) {
+    let aggregation = [];
+
+    for (let i = 0; i < functionFields.length; i++) {
+        let nestedModel = getFieldModel(model, nestedModels, functionFields[i]);
+        let columnField = getLiteralField(functionFields[i], nestedModel);
+
+        if (sqlFunction === 'countDistinct') {
+            aggregation.push(
+                [ Sequelize.literal('count(distinct(' + columnField + '))'), functionFields[i] ]
+            );
+
+        } else if (sqlFunction === 'groupBy') {
+            aggregation.push(
+                [ Sequelize.literal(columnField), functionFields[i] ]
+            ); 
+
+        } else {
+            aggregation.push(
+                [ Sequelize.literal(sqlFunction + '(' + columnField + ')'), functionFields[i] ]
+            );            
+        }
+    }
+
+    return aggregation;
 }
 
 function buildProjections(projection, modelAlias = null) {
@@ -85,34 +151,46 @@ function buildGroupBy(groupBy, model, nestedModels) {
 
     for (let i = 0; i < groupByFields.length; i++) {
         let nestedModel = getNestedModel(nestedModels, groupByFields[i]);
-        let field = getSignificantField(groupByFields[i]);
 
         query.group = query.group || [];
-        
+
         if (nestedModel === null) {
-            query.group.push([ model, field ]);
+            query.group.push([ getLiteralLastField(groupByFields[i], model) ]);
+        
         } else {
-            query.group.push([ nestedModel, field ]);
+            query.group.push([ getLiteralLastField(groupByFields[i], nestedModel.model) ]);
         }
     }
 
     return query;
 }
 
-function buildOrder(sort, model, nestedModels) {
+function buildOrder(sort, nestedModels, model) {
     let orderFields = queryParser.parseSortOrder(sort);
     let query = {};
 
     for (let i = 0; i < orderFields.length; i++) {
-        let nestedModel = getNestedModel(nestedModels, orderFields[i].field);
-        let field = getSignificantField(orderFields[i].field);
+        let splittedField = orderFields[i].field.split('.');
+        let field = splittedField[splittedField.length - 1];
 
         query.order = query.order || [];
         
-        if (nestedModel === null) {
-            query.order.push([ model, ield, orderFields[i].sortOrder.order ]);
+        if (splittedField.length > 1) {
+            let order = [];
+            let lastNestedModel = null;
+
+            for (let j = 0; j < splittedField.length - 1; j++) {
+                lastNestedModel = getNestedModelByName(nestedModels, splittedField[j]);
+                order.push(lastNestedModel);
+            }
+            
+            order.push(getModelColumnField(field, lastNestedModel.model));
+            order.push(orderFields[i].sortOrder.order)
+
+            query.order.push([ order ]);
+
         } else {
-            query.order.push([ nestedModel, field, orderFields[i].sortOrder.order ]);
+            query.order.push([ getModelColumnField(field, model), orderFields[i].sortOrder.order ]);
         }
     }
 
@@ -167,12 +245,27 @@ function getFieldModel(model, nestedModels, field) {
     return nestedModel.model;
 }
 
+function getNestedModelByName(nestedModels, fieldModelName) {
+    let nestedModel = null;    
+
+    if (fieldModelName !== null) {
+        let nestedModelFound = nestedModels.find(nested => nested.as === fieldModelName);
+       
+        if (nestedModelFound) {
+            nestedModel = nestedModelFound;
+        }
+    }
+
+    return nestedModel;
+}
+
 function getNestedModel(nestedModels, field) {
     let nestedModel = null;    
     let fieldModelName = getFieldModelName(field);
 
     if (fieldModelName !== null) {
         let nestedModelFound = nestedModels.find(nested => nested.as === fieldModelName);
+       
         if (nestedModelFound) {
             nestedModel = nestedModelFound;
         }
@@ -274,18 +367,6 @@ function buildWhereCondition(filterField, fieldModel) {
     }
 }
 
-function getAllModelFields(model) {
-    let fieldNames = [];
-    let modelFields = Object.keys(model.fieldRawAttributesMap);
-
-    for (let i = 0; i < modelFields.length; i++) {
-        let modelField = modelFields[i];
-        fieldNames.push(model.fieldRawAttributesMap[modelField].fieldName);
-    }
-
-    return fieldNames;
-}
-
 function getColumnField(fullPathField, field, fieldModel) {
     let modelFields = Object.keys(fieldModel.fieldRawAttributesMap);
     let originalColumnField = '';
@@ -307,6 +388,70 @@ function getColumnField(fullPathField, field, fieldModel) {
     }
 
     return '$' + splittedFullPathField.join('.') + '$';
+}
+
+function getModelColumnField(fullPathField, fieldModel) {
+    let modelFields = Object.keys(fieldModel.fieldRawAttributesMap);
+    let splittedField = fullPathField.split('.');
+    let fieldName = splittedField[splittedField.length - 1];
+    let columnField = null;
+
+    for (let i = 0; i < modelFields.length; i++) {
+        let modelField = modelFields[i];
+
+        if (fieldModel.fieldRawAttributesMap[modelField].fieldName === fieldName) {
+            columnField = modelField;
+            break;
+        }
+    }
+
+    if (columnField !== null) {
+        splittedField[splittedField.length - 1] = columnField;
+    }
+
+    return splittedField.join('.');
+}
+
+function getLiteralLastField(field, model) {
+    let fields = field.split('.');
+    let columnField = getModelColumnField(fields[fields.length - 1], model);
+    fields[fields.length - 1] = columnField;
+
+    if (fields.length === 1) {
+        return model.name + '.' + fields.join('.');
+    }
+    
+    return fields.join('.');
+}
+
+function getLiteralField(field, model) {
+    let fields = field.split('.');
+    let literalField = '';
+    let columnField = getModelColumnField(fields[fields.length - 1], model);
+
+    if (fields.length === 1 && model) {
+        literalField = '"' + model.name + '"."' + columnField + '"';
+    
+    }  else if (fields.length === 2) {
+        literalField = '"' + fields[0] + '"."' + columnField + '"';
+    
+    } else {
+        literalField += '"';
+
+        for (let i = 0; i < fields.length; i++) {
+            if (i < (fields.length - 2)) {
+                literalField += fields[i] + '->';
+
+            } else if (i === (fields.length - 2)) {
+                literalField += fields[i] + '"."';
+            
+            } else {
+                literalField += columnField + '"';
+            }
+        }
+    }
+ 
+    return literalField;
 }
 
 function getFieldModelName(field) {

@@ -7,6 +7,14 @@ const DEFAULT_OFFSET = 0;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
+function hasValidAggregateFunction(requestQuery) {
+    return (requestQuery.sum != null && '' !== requestQuery.sum) || 
+            (requestQuery.avg != null && '' !== requestQuery.avg) || 
+            (requestQuery.count != null && '' !== requestQuery.count) ||
+            (requestQuery.countDistinct != null && '' !== requestQuery.countDistinct);
+}
+    
+
 function getOffset(requestQuery) {
     if (requestQuery.offset === undefined || requestQuery.offset === null) {
         return DEFAULT_OFFSET;
@@ -232,4 +240,12 @@ function processOperator(expressionString, index) {
     return LogicOperator.getLogicOperator(logicOperatorText.trim());
 }
 
-export default { getLimit, getOffset, parseSeletor, parseSortOrder, parseRequestSymbols, parseFilterExpressions };
+export default { 
+    hasValidAggregateFunction, 
+    getLimit, 
+    getOffset, 
+    parseSeletor, 
+    parseSortOrder, 
+    parseRequestSymbols, 
+    parseFilterExpressions 
+};
