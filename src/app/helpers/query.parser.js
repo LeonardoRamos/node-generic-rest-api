@@ -13,7 +13,6 @@ function hasValidAggregateFunction(requestQuery) {
             (requestQuery.count != null && '' !== requestQuery.count) ||
             (requestQuery.countDistinct != null && '' !== requestQuery.countDistinct);
 }
-    
 
 function getOffset(requestQuery) {
     if (requestQuery.offset === undefined || requestQuery.offset === null) {

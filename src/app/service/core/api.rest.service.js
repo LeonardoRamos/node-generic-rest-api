@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import Sequelize from 'sequelize';
 import queryBuilder from '../../helpers/query.builder';
+import resultMapper from '../../helpers/result.mapper';
 
 module.exports = class ApiRestService {
     
@@ -24,15 +25,9 @@ module.exports = class ApiRestService {
         let query = queryBuilder.buildQuery(this.model, req.query);
         let result = await this.model.findAndCountAll(query)
 
-        console.log(result);
-
         return {
-            records: result.rows,
-            metadata: {
-                totalCount: result.count,
-                pageOffset: query.offset,
-                pageSize: query.limit
-            }
+            records: resultMapper.mapResulRecords(result),
+            metadata: resultMapper.mapResultMetadata(query, result)
         };
     }
 
