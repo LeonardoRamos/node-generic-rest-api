@@ -3,7 +3,7 @@ import config from './src/app/config/config';
 import app from './src/app/config/express';
 import db from './src/app/config/sequelize';
 
-const debug = require('debug')('express-postgresql-sequelize-es6-rest-api:index');
+const debug = require('debug')('node-generic-rest-api:app');
 
 Promise = require('bluebird'); 
 
