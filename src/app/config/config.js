@@ -16,7 +16,7 @@ const envVarsSchema = Joi.object({
 
     PG_DB: Joi.string()
         .description('Postgres database name')
-        .default('Test'),
+        .default('TestNode'),
 
     PG_PORT: Joi.number().default(5432),
     PG_HOST: Joi.string().default('localhost'),
