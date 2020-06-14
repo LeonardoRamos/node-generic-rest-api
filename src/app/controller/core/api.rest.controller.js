@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import httpStatus from 'http-status';
+import Sequelize from 'sequelize';
 
 module.exports = class ApiRestController {
     
@@ -28,7 +29,7 @@ module.exports = class ApiRestController {
             return next();
     
         } catch (error) {
-            return next(error);
+            return this.handleError(error, next);
         }
     }
     
@@ -39,7 +40,9 @@ module.exports = class ApiRestController {
     insert(req, res, next) {
         return this.apiService.save(req.body)
             .then(savedEntity => res.json(savedEntity))
-            .catch(e => next(e));
+            .catch(e => {
+                return this.handleError(e, next);
+            });
     }
     
     update(req, res, next) {
@@ -47,19 +50,33 @@ module.exports = class ApiRestController {
     
         return this.apiService.update(entity)
             .then(savedEntity => res.json(savedEntity))
-            .catch(e => next(e));
+            .catch(e => {
+                return this.handleError(e, next);
+            });
     }
     
     list(req, res, next) {
         return this.apiService.findAll(req)
             .then(entities => res.json(entities))
-            .catch(e => next(e));
+            .catch(e => {
+                return this.handleError(e, next);
+            });
     }
     
     remove(req, res, next) {
         return this.apiService.delete(req.entity)
             .then(() => res.status(204))
-            .catch(e => next(e));
+            .catch(e => {
+                return this.handleError(e, next);
+            });
+    }
+
+    handleError(e, next) {
+        if (e instanceof Sequelize.BaseError) {
+            e.status = httpStatus.BAD_REQUEST;
+        }
+
+        return next(e);
     }
 
     paramValidation() {

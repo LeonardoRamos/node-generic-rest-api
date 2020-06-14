@@ -23,10 +23,10 @@ module.exports = class ApiRestService {
 
     async findAll(req) {
         let query = queryBuilder.buildQuery(this.model, req.query);
-        let result = await this.model.findAndCountAll(query)
+        let result = await this.model.findAndCountAll(query);
 
         return {
-            records: resultMapper.mapResulRecords(result),
+            records: resultMapper.mapResulRecords(result, req.query),
             metadata: resultMapper.mapResultMetadata(query, result)
         };
     }

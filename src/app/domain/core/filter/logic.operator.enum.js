@@ -24,10 +24,10 @@ LogicOperator.isAndOperator = logicOperator => {
 };
 
 LogicOperator.getLogicOperator = logicOperator => {
-    if (LogicOperator.isOrOperator(logicalOperator)) {
+    if (LogicOperator.isOrOperator(logicOperator)) {
         return LogicOperator.OR;
     
-    } else if (LogicOperator.isAndOperator(logicalOperator)) {
+    } else if (LogicOperator.isAndOperator(logicOperator)) {
         return LogicOperator.AND;
     }
     

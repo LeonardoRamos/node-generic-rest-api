@@ -56,12 +56,30 @@ app.use((err, req, res, next) => {
         return next(error);
     
     } else if (!(err instanceof ApiError)) {
+        dumpError(err);
         const apiError = new ApiError(err.message, err.status, err.isPublic);
         return next(apiError);
     }
     
     return next(err);
 });
+
+function dumpError(err) {
+    if (typeof err === 'object') {
+        if (err.message) {
+            console.log('\nMessage: ' + err.message)
+        }
+        
+        if (err.stack) {
+            console.log('\nStacktrace:')
+            console.log('====================')
+            console.log(err.stack);
+        }
+    
+    } else {
+        console.log('dumpError :: argument is not an object');
+    }
+}
 
 app.use((req, res, next) => {
     const err = new ApiError('API not found', httpStatus.NOT_FOUND);

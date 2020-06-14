@@ -141,7 +141,7 @@ function parseFilterExpressions(expressionString) {
                 currentExpression.filterField = parseFilterField(word.trim());
                 currentExpression = processNewExpressionNode(currentExpression);
                 
-                i += logicOperator.getOperator().length - 1;
+                i += logicOperator.operator.length - 1;
                 word = '';
             
             } else {

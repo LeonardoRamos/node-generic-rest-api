@@ -1,10 +1,54 @@
 import queryParser from './query.parser';
+import AggregateFunction from '../domain/core/filter/aggregate.function.enum';
 
-function mapResulRecords(result) {
+function mapResulRecords(result, requestQuery) {
     return result.rows.map((row) => {
+        let aggregation = {
+            sum: queryParser.parseSeletor(requestQuery.sum),
+            avg: queryParser.parseSeletor(requestQuery.avg),
+            count: queryParser.parseSeletor(requestQuery.count)
+                .concat(queryParser.parseSeletor(requestQuery.countDistinct))
+        };
+
+        formatAggregateFields(row, aggregation, AggregateFunction.SUM.function);
+        formatAggregateFields(row, aggregation, AggregateFunction.COUNT.function);
+        formatAggregateFields(row, aggregation, AggregateFunction.AVG.function);
+
         removeField(row);
+
         return row;
     });
+}
+
+function formatAggregateFields(row, aggregation, sqlFunction) {
+    for (let i = 0; i < aggregation[sqlFunction].length; i++) {
+        let splittedField = aggregation[sqlFunction][i].split('.');
+
+        let rootField = splittedField[0];
+        let rowField = row[rootField];
+
+        let matchField = true;
+
+        for (let j = 1; j < splittedField.length; j++) {
+            let subField = splittedField[j];
+
+            if (rowField[subField]) {
+                rowField = rowField[subField];
+            } else {
+                matchField = false;
+                break;
+            }
+        }
+
+        if (typeof rowField === 'object') {
+            matchField = false;
+        }
+
+        row[sqlFunction] = row[sqlFunction] || {};
+        row[sqlFunction][rootField] = row[rootField];
+
+        delete row[rootField];
+    }
 }
 
 function maskNestedObject(fieldValue) {
@@ -24,8 +68,15 @@ function removeField(row) {
             delete row[field];
         }
         
-        maskNestedObject(row[field]);
+        if (!isAggregationField(field)) {
+            maskNestedObject(row[field]);
+        }
     });
+}
+
+function isAggregationField(field) {
+    return field === AggregateFunction.SUM.function || field === AggregateFunction.AVG.function 
+            || field === AggregateFunction.COUNT.function;
 }
 
 function mapResultMetadata(query, result) {
@@ -50,7 +101,4 @@ function mapResultMetadata(query, result) {
     return metadata;
 }
 
-export default { 
-    mapResulRecords, 
-    mapResultMetadata 
-};
+export default { mapResulRecords, mapResultMetadata };

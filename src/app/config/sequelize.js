@@ -3,6 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
 import config from './config';
+import pg from 'pg';
+
+pg.defaults.parseInt8 = true;
 
 const db = {};
 

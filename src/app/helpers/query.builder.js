@@ -1,4 +1,5 @@
 import LogicOperator from '../domain/core/filter/logic.operator.enum';
+import AggregateFunction from '../domain/core/filter/aggregate.function.enum';
 import FilterOperator from '../domain/core/filter/filter.operator.enum';
 import queryParser from './query.parser';
 import Sequelize from 'sequelize';
@@ -81,11 +82,11 @@ function buildAggregations(requestQuery, model, nestedModels) {
         return query;
     }
 
-    let aggregation = buildFunctionProjection(sum, 'sum', model, nestedModels);
-    aggregation = aggregation.concat(buildFunctionProjection(avg, 'avg', model, nestedModels));
-    aggregation = aggregation.concat(buildFunctionProjection(count, 'count', model, nestedModels));
-    aggregation = aggregation.concat(buildFunctionProjection(countDistinct, 'countDistinct', model, nestedModels));
-    aggregation = aggregation.concat(buildFunctionProjection(groupBy, 'groupBy', model, nestedModels));
+    let aggregation = buildFunctionProjection(sum, AggregateFunction.SUM.function, model, nestedModels);
+    aggregation = aggregation.concat(buildFunctionProjection(avg, AggregateFunction.AVG.function, model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(count, AggregateFunction.COUNT.function, model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(countDistinct, AggregateFunction.COUNT_DISTINCT.function, model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(groupBy, AggregateFunction.GROUP_BY.function, model, nestedModels));
 
     query.attributes = aggregation;
 
@@ -99,12 +100,12 @@ function buildFunctionProjection(functionFields, sqlFunction, model, nestedModel
         let nestedModel = getFieldModel(model, nestedModels, functionFields[i]);
         let columnField = getLiteralField(functionFields[i], nestedModel);
 
-        if (sqlFunction === 'countDistinct') {
+        if (sqlFunction === AggregateFunction.COUNT_DISTINCT.function) {
             aggregation.push(
-                [ Sequelize.literal('count(distinct(' + columnField + '))'), functionFields[i] ]
+                [ Sequelize.literal(sqlFunction + '(' + columnField + '))'), functionFields[i] ]
             );
 
-        } else if (sqlFunction === 'groupBy') {
+        } else if (sqlFunction === AggregateFunction.GROUP_BY.function) {
             aggregation.push(
                 [ Sequelize.literal(columnField), functionFields[i] ]
             ); 
@@ -215,14 +216,16 @@ function buildWhere(filter, model, nestedModels) {
                     conjunctionQuery.push(buildPredicate(currentExpression.filterField, fieldModel));
                     currentExpression = currentExpression.filterExpression;
                 
-                } while (currentExpression !== null && LogicOperator.OR.name === currentExpression.logicOperator.name);
+                } while (currentExpression !== null && currentExpression.logicOperator 
+                        && LogicOperator.OR.name === currentExpression.logicOperator.name);
                 
                 if (currentExpression !== null && currentExpression.filterField !== null) {
+                    fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
                     conjunctionQuery.push(buildPredicate(currentExpression.filterField, fieldModel));
                 }
-                
+
                 query.where[Op.or] = query.where[Op.or] || [];
-                query.where[Op.or].concat(conjunctionQuery);
+                query.where[Op.or] = query.where[Op.or].concat(conjunctionQuery);
 
             } else {
                 query.where = { ...query.where, ...buildPredicate(currentExpression.filterField, fieldModel) };
@@ -282,7 +285,7 @@ function getNestedModels(model, models = []) {
                     model: model.associations[key].target,
                     as: key
                 });
-                models.concat(getNestedModels(model.associations[key].target, models))                
+                models = models.concat(getNestedModels(model.associations[key].target, models))                
             }
         });
     }
