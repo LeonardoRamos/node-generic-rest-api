@@ -9,7 +9,6 @@ module.exports = class UserService extends ApiRestService {
         super(User);
 
         this.save = this.save.bind(this);
-        this.update = this.update.bind(this);
     }
 
     async findByEmail(email) {
@@ -23,11 +22,6 @@ module.exports = class UserService extends ApiRestService {
     save(user) {
         user.password = bcrypt.hashSync(user.password, user.password.length);
         return super.save(user);
-    }
-
-    update(user) {
-        user.password = bcrypt.hashSync(user.password, user.password.length);
-        return super.update(user);
     }
 
 }
