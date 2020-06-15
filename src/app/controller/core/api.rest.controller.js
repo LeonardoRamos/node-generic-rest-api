@@ -56,7 +56,7 @@ module.exports = class ApiRestController {
     }
     
     list(req, res, next) {
-        return this.apiService.findAll(req)
+        return this.apiService.findAll(req.query)
             .then(entities => res.json(entities))
             .catch(e => {
                 return this.handleError(e, next);

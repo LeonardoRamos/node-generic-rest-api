@@ -21,18 +21,18 @@ module.exports = class ApiRestService {
         });   
     }
 
-    async findAll(req) {
-        let query = queryBuilder.buildQuery(this.model, req.query);
+    async findAll(requestQuery) {
+        let query = queryBuilder.buildQuery(this.model, requestQuery);
         let result = await this.model.findAndCountAll(query);
 
         return {
-            records: resultMapper.mapResulRecords(result, req.query),
+            records: resultMapper.mapResulRecords(result, requestQuery),
             metadata: resultMapper.mapResultMetadata(query, result)
         };
     }
 
     async save(entity) {
-        const entityModel = this.model.build(req.entity);
+        const entityModel = this.model.build(entity);
         
         entityModel.slug = uuidv4().split('-').join('').toUpperCase();
         entityModel.insertDate = Sequelize.NOW;
