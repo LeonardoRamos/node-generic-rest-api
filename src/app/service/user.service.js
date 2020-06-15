@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import ApiRestService from './core/api.rest.service';
 import db from '../config/sequelize';
+
 const User = db.User;
 
 module.exports = class UserService extends ApiRestService {
