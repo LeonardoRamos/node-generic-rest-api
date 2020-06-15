@@ -1,7 +1,7 @@
 import 'babel-polyfill';
-import config from './src/app/config/config';
-import app from './src/app/config/express';
-import db from './src/app/config/sequelize';
+import config from './config/config';
+import app from './config/express';
+import db from './config/sequelize';
 
 const debug = require('debug')('node-generic-rest-api:app');
 

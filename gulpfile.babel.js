@@ -55,7 +55,7 @@ gulp.task('babel', () =>
 // Start server with restart on file changes
 gulp.task('nodemon', ['copy', 'babel'], () =>
     plugins.nodemon({
-        script: path.join('dist', 'app.js'),
+        script: path.join('dist', 'src/app/app.js'),
         ext: 'js',
         ignore: ['node_modules/**/*.js', 'dist/**/*.js'],
         tasks: ['copy', 'babel'],
