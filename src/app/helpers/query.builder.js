@@ -213,7 +213,7 @@ function buildWhere(filter, model, nestedModels) {
                 let conjunctionQuery = [];
 
                 do {
-                    conjunctionQuery.push(buildPredicate(currentExpression.filterField, fieldModel));
+                    conjunctionQuery.push(buildWhereCondition(currentExpression.filterField, fieldModel));
                     currentExpression = currentExpression.filterExpression;
                 
                 } while (currentExpression !== null && currentExpression.logicOperator 
@@ -221,14 +221,14 @@ function buildWhere(filter, model, nestedModels) {
                 
                 if (currentExpression !== null && currentExpression.filterField !== null) {
                     fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
-                    conjunctionQuery.push(buildPredicate(currentExpression.filterField, fieldModel));
+                    conjunctionQuery.push(buildWhereCondition(currentExpression.filterField, fieldModel));
                 }
 
                 query.where[Op.or] = query.where[Op.or] || [];
                 query.where[Op.or] = query.where[Op.or].concat(conjunctionQuery);
 
             } else {
-                query.where = { ...query.where, ...buildPredicate(currentExpression.filterField, fieldModel) };
+                query.where = { ...query.where, ...buildWhereCondition(currentExpression.filterField, fieldModel) };
             }
         }
         
@@ -290,18 +290,14 @@ function getNestedModels(model, models = []) {
         });
     }
     return models;
-}
-
-function buildPredicate(filterField, fieldModel) {
-    if ('null' === filterField.value) {
-        filterField.value = null;
-    }
-
-    return buildWhereCondition(filterField, fieldModel);
-}    
+} 
 
 function buildWhereCondition(filterField, fieldModel) {
     let columnField = getColumnField(filterField.field, getSignificantField(filterField.field), fieldModel);
+    
+    if ('null' === filterField.value) {
+        filterField.value = null;
+    }
 
     switch (filterField.filterOperator.name) {
         case FilterOperator.IN.name:
