@@ -293,7 +293,7 @@ function getNestedModels(model, models = []) {
 } 
 
 function buildWhereCondition(filterField, fieldModel) {
-    let columnField = getColumnField(filterField.field, getSignificantField(filterField.field), fieldModel);
+    let columnField = getWhereField(filterField.field, getSignificantField(filterField.field), fieldModel);
     
     if ('null' === filterField.value) {
         filterField.value = null;
@@ -366,7 +366,7 @@ function buildWhereCondition(filterField, fieldModel) {
     }
 }
 
-function getColumnField(fullPathField, field, fieldModel) {
+function getWhereField(fullPathField, field, fieldModel) {
     let modelFields = Object.keys(fieldModel.fieldRawAttributesMap);
     let originalColumnField = '';
 
