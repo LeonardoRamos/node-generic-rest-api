@@ -43,11 +43,11 @@ module.exports = class ApiRestService {
 
     async update(entityModel) {
         entityModel.updateDate = Sequelize.NOW;
-        return await entity.save();
+        return await entityModel.save();
     }
 
-    async delete(entity) {
-        return await entity.destroy();
+    async delete(entityModel) {
+        return await entityModel.destroy();
     }
 
 }
