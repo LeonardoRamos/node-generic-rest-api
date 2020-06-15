@@ -96,7 +96,7 @@ function mapResultMetadata(query, result) {
         count += +result.count[i].count;
     }
 
-    metadata.count = +count;
+    metadata.count = count;
 
     return metadata;
 }
