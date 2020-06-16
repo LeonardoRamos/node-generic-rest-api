@@ -1,4 +1,24 @@
-import AddressDefinition from '../definition/address.definition';
+import Sequelize from 'sequelize';
+import BaseEntity from './core/base.entity';
+
+class AddressDefinition extends BaseEntity {
+    
+    constructor() {
+        super();
+        
+        this.street = {
+            type: Sequelize.STRING
+        };
+        this.streetNumber = {
+            type: Sequelize.STRING,
+            field: 'street_number'
+        };
+        this.state = {
+            type: Sequelize.STRING
+        };
+    }
+
+}
 
 const addressDefinition = new AddressDefinition();
 

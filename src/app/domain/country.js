@@ -1,4 +1,17 @@
-import CountryDefinition from '../definition/country.definition';
+import Sequelize from 'sequelize';
+import BaseEntity from './core/base.entity';
+
+class CountryDefinition extends BaseEntity {
+    
+    constructor() {
+        super();
+        
+        this.name = {
+            type: Sequelize.STRING
+        };
+    }
+    
+}
 
 const countryDefinition = new CountryDefinition();
 
