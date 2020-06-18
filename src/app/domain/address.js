@@ -2,7 +2,6 @@ import Sequelize from 'sequelize';
 import BaseEntity from './core/base.entity';
 
 class AddressDefinition extends BaseEntity {
-    
     constructor() {
         super();
         
@@ -17,7 +16,6 @@ class AddressDefinition extends BaseEntity {
             type: Sequelize.STRING
         };
     }
-
 }
 
 const addressDefinition = new AddressDefinition();
