@@ -6,7 +6,7 @@
     "main": "./src/app/main.js",
     "private": false,
     "engines": {
-        "node": ">=6.9.1",
+        "node": ">=10.21.0",
         "npm": ">=2.15.11",
         "yarn": ">=0.20.3"
     },
