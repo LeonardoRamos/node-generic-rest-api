@@ -15,14 +15,14 @@ module.exports = class UserController extends ApiRestController {
             ...super.paramValidation(), 
             ...{ 
                 insert: {
-                    body: {
+                    body: Joi.object({
                         username: Joi.string().required(),
-                    }
+                    })
                 },
                 update: {
-                    body: {
+                    body: Joi.object({
                         username: Joi.string().required(),
-                    }
+                    })
                 }
             }
         }

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import Joi from 'joi';
+import { Joi } from 'express-validation';
 import httpStatus from 'http-status';
 import ApiError from '../helpers/api.error';
 import config from '../config/config';
@@ -31,10 +31,10 @@ async function login(req, res, next) {
 function paramValidation() {
     return { 
         login: {
-            body: {
+            body: Joi.object({
                 email: Joi.string().required(),
                 password: Joi.string().required(),
-            },
+            }),
         }
     }
 }

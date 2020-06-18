@@ -1,4 +1,4 @@
-import Joi from 'joi';
+import { Joi } from 'express-validation';
 import httpStatus from 'http-status';
 import Sequelize from 'sequelize';
 
@@ -86,9 +86,9 @@ module.exports = class ApiRestController {
             },
             update: {
                 body: {},
-                params: {
+                params: Joi.object({
                     slug: Joi.string().hex().required(),
-                }
+                })
             }
         };
     }

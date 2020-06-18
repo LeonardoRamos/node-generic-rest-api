@@ -9,7 +9,7 @@ const envVarsSchema = Joi.object({
 
     PORT: Joi.number().default(9503),
 
-    JWT_EXPIRATION: Joi.number().default(86000000),
+    JWT_EXPIRATION: Joi.number().default(86000),
     JWT_SECRET: Joi.string()
         .description('JWT Secret required to sign')
         .default('6cfaef779158723ca4998ec416d18eb8'),
