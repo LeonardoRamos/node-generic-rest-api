@@ -1,7 +1,7 @@
 import config from '../config/config';
 import express from 'express';
 import expressJwt from 'express-jwt';
-import validate from 'express-validation';
+import { validate } from 'express-validation';
 import UserController from '../controller/user.controller';
 
 const router = express.Router();

@@ -2,7 +2,6 @@ import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import path from 'path';
 import del from 'del';
-import runSequence from 'run-sequence';
 import * as isparta from 'isparta';
 
 const plugins = gulpLoadPlugins();
@@ -10,7 +9,7 @@ const plugins = gulpLoadPlugins();
 const paths = {
     js: ['./**/*.js', '!dist/**', '!node_modules/**', '!coverage/**'],
     nonJs: ['./package.json', './.gitignore', './.env'],
-    tests: './server/tests/*.js',
+    tests: './src/app/tests/*.js',
 };
 
 const options = {
@@ -28,18 +27,22 @@ const options = {
 };
 
 // Clean up dist and coverage directory
-gulp.task('clean', () => del.sync(['dist/**', 'dist/.*', 'coverage/**', '!dist', '!coverage']));
+gulp.task('clean', (done) => { 
+    del.sync(['dist/**', 'dist/.*', 'coverage/**', '!dist', '!coverage'])
+    done();
+});
 
 // Copy non-js files to dist
-gulp.task('copy', () =>
-    gulp
-        .src(paths.nonJs)
+gulp.task('copy', () => {
+    return gulp
+        .src(paths.nonJs, { allowEmpty: true })
         .pipe(plugins.newer('dist'))
-        .pipe(gulp.dest('dist')));
+        .pipe(gulp.dest('dist'))
+});
 
 // Compile ES6 to ES5 and copy to dist
-gulp.task('babel', () =>
-    gulp
+gulp.task('babel', (done) => {
+    return gulp
         .src([...paths.js, '!gulpfile.babel.js'], { base: '.' })
         .pipe(plugins.newer('dist'))
         .pipe(plugins.sourcemaps.init())
@@ -50,42 +53,40 @@ gulp.task('babel', () =>
                 return path.relative(file.path, __dirname);
             },
         }))
-        .pipe(gulp.dest('dist')));
+        .pipe(gulp.dest('dist'))
+});
 
 // Start server with restart on file changes
-gulp.task('nodemon', ['copy', 'babel'], () =>
+gulp.task('nodemon', gulp.series('copy', 'babel', (done) => {
     plugins.nodemon({
-        script: path.join('dist', 'src/app/app.js'),
+        script: path.join('dist', 'src/app/main.js'),
         ext: 'js',
         ignore: ['node_modules/**/*.js', 'dist/**/*.js'],
         tasks: ['copy', 'babel'],
-    }));
+    })
+    done();
+}));
 
 // gulp server for development
-gulp.task('server', ['clean'], () => runSequence('nodemon'));
+gulp.task('server', gulp.series('clean', 'nodemon'));
 
 // default task: clean dist, compile js files and copy non-js files.
-gulp.task('default', ['clean'], () => {
-    runSequence(['copy', 'babel']);
-});
-
-// clean dist, compile js files, copy non-js files and execute tests
-gulp.task('mocha', ['clean'], () => {
-    runSequence(['copy', 'babel'], 'test');
-});
+gulp.task('default', gulp.series('clean', 'copy', 'babel'));
 
 // Set env variables
-gulp.task('set-env', () => {
+gulp.task('set-env', (done) => {
     plugins.env({
         vars: {
             NODE_ENV: 'test',
         },
     });
+
+    done();
 });
 
 // covers files for code coverage
-gulp.task('pre-test', () =>
-    gulp
+gulp.task('pre-test', () => {
+    return gulp
         .src([...paths.js, '!gulpfile.babel.js'])
         // Covering files
         .pipe(plugins.istanbul({
@@ -93,10 +94,11 @@ gulp.task('pre-test', () =>
             includeUntested: true,
         }))
         // Force `require` to return covered files
-        .pipe(plugins.istanbul.hookRequire()));
+        .pipe(plugins.istanbul.hookRequire())
+});
 
 // triggers mocha test with code coverage
-gulp.task('test', ['pre-test', 'set-env'], () => {
+gulp.task('test', gulp.series('pre-test', 'set-env', () => {
     let reporters;
     let exitCode = 0;
 
@@ -135,4 +137,7 @@ gulp.task('test', ['pre-test', 'set-env'], () => {
                 process.exit(exitCode);
             })
     );
-});
+}));
+
+// clean dist, compile js files, copy non-js files and execute tests
+gulp.task('mocha', gulp.series('clean', 'copy', 'babel', 'test'));

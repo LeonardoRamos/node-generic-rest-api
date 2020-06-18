@@ -1,9 +1,9 @@
-import 'babel-polyfill';
+import '@babel/polyfill';
 import config from './config/config';
 import app from './config/express';
 import db from './config/sequelize';
 
-const debug = require('debug')('node-generic-rest-api:app');
+const debug = require('debug')('node-generic-rest-api:main');
 
 Promise = require('bluebird'); 
 

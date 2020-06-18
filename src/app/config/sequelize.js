@@ -24,10 +24,11 @@ const modelsDir = path.normalize(`${__dirname}/../domain`);
 
 fs
     .readdirSync(modelsDir, { withFileTypes: true })
-    .filter(file => file.indexOf('.') !== 0 && file.indexOf('.map') === -1 && file.indexOf('.js') !== -1)
+    .filter(file => file.name.indexOf('.') !== 0 && file.name.indexOf('.map') === -1 
+            && file.name.indexOf('.js') !== -1 && file.isFile())
     .forEach((file) => {
         console.info(`Loading model file ${file}`);
-        const model = sequelize.import(path.join(modelsDir, file));
+        const model = sequelize.import(path.join(modelsDir, file.name));
         db[model.name] = model;
     });
 
