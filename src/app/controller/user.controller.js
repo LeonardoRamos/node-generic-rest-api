@@ -1,4 +1,4 @@
-import Joi from 'joi';
+import { Joi } from 'express-validation';
 import ApiRestController from './core/api.rest.controller';
 import UserService from '../service/user.service';
 

@@ -1,10 +1,10 @@
-import Joi from 'joi';
+import Joi from '@hapi/joi';
 
 require('dotenv').config();
 
 const envVarsSchema = Joi.object({
-    NODE_ENV: Joi.string()
-        .allow(['development', 'production', 'test', 'provision'])
+    NODE_ENV: Joi.any()
+        .valid(...['development', 'production', 'test', 'provision'])
         .default('development'),
 
     PORT: Joi.number().default(9503),
@@ -27,13 +27,14 @@ const envVarsSchema = Joi.object({
     PG_PASSWORD: Joi.string()
         .allow('')
         .description('Postgres password')
-        .default('postgres'),
+        .default('postgres')
+        .optional(),
 
 })
     .unknown()
     .required();
 
-const { error, value: envVars } = Joi.validate(process.env, envVarsSchema);
+const { error, value: envVars } = envVarsSchema.validate(process.env);
 if (error) {
     throw new Error(`Config validation error: ${error.message}`);
 }

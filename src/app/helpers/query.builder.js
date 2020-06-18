@@ -54,9 +54,9 @@ function buildIncludes(requestQuery, model, rootModel = model, query = {}) {
                 query.include.push(associationInclude);
 
                 if (model.associations[key].target.name !== rootModel.name) {
-                    let currentJoin = query.include[query.include.length - 1];    
-                    let childJoin = buildIncludes(requestQuery, model.associations[key].target, rootModel, currentJoin);
                     let lastIndex = query.include.length - 1;
+                    let currentJoin = query.include[lastIndex];    
+                    let childJoin = buildIncludes(requestQuery, model.associations[key].target, rootModel, currentJoin);
                     
                     query.include[lastIndex] = { ...currentJoin, ...childJoin };
                 }
@@ -238,60 +238,6 @@ function buildWhere(filter, model, nestedModels) {
     return query;
 }
 
-function getFieldModel(model, nestedModels, field) {
-    let nestedModel = getNestedModel(nestedModels, field);
-
-    if (nestedModel === null) {
-        return model;
-    }
-
-    return nestedModel.model;
-}
-
-function getNestedModelByName(nestedModels, fieldModelName) {
-    let nestedModel = null;    
-
-    if (fieldModelName !== null) {
-        let nestedModelFound = nestedModels.find(nested => nested.as === fieldModelName);
-       
-        if (nestedModelFound) {
-            nestedModel = nestedModelFound;
-        }
-    }
-
-    return nestedModel;
-}
-
-function getNestedModel(nestedModels, field) {
-    let nestedModel = null;    
-    let fieldModelName = getFieldModelName(field);
-
-    if (fieldModelName !== null) {
-        let nestedModelFound = nestedModels.find(nested => nested.as === fieldModelName);
-       
-        if (nestedModelFound) {
-            nestedModel = nestedModelFound;
-        }
-    }
-
-    return nestedModel;
-}
-
-function getNestedModels(model, models = []) {
-    if (model.associations) {
-        Object.keys(model.associations).forEach((key) => {
-            if (model.associations[key].target) {
-                models.push({
-                    model: model.associations[key].target,
-                    as: key
-                });
-                models = models.concat(getNestedModels(model.associations[key].target, models))                
-            }
-        });
-    }
-    return models;
-} 
-
 function buildWhereCondition(filterField, fieldModel) {
     let columnField = getWhereField(filterField.field, getSignificantField(filterField.field), fieldModel);
     
@@ -388,6 +334,60 @@ function getWhereField(fullPathField, field, fieldModel) {
 
     return '$' + splittedFullPathField.join('.') + '$';
 }
+
+function getFieldModel(model, nestedModels, field) {
+    let nestedModel = getNestedModel(nestedModels, field);
+
+    if (nestedModel === null) {
+        return model;
+    }
+
+    return nestedModel.model;
+}
+
+function getNestedModelByName(nestedModels, fieldModelName) {
+    let nestedModel = null;    
+
+    if (fieldModelName !== null) {
+        let nestedModelFound = nestedModels.find(nested => nested.as === fieldModelName);
+       
+        if (nestedModelFound) {
+            nestedModel = nestedModelFound;
+        }
+    }
+
+    return nestedModel;
+}
+
+function getNestedModel(nestedModels, field) {
+    let nestedModel = null;    
+    let fieldModelName = getFieldModelName(field);
+
+    if (fieldModelName !== null) {
+        let nestedModelFound = nestedModels.find(nested => nested.as === fieldModelName);
+       
+        if (nestedModelFound) {
+            nestedModel = nestedModelFound;
+        }
+    }
+
+    return nestedModel;
+}
+
+function getNestedModels(model, models = []) {
+    if (model.associations) {
+        Object.keys(model.associations).forEach((key) => {
+            if (model.associations[key].target) {
+                models.push({
+                    model: model.associations[key].target,
+                    as: key
+                });
+                models = models.concat(getNestedModels(model.associations[key].target, models))                
+            }
+        });
+    }
+    return models;
+} 
 
 function getModelColumnField(fullPathField, fieldModel) {
     let modelFields = Object.keys(fieldModel.fieldRawAttributesMap);
