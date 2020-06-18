@@ -23,13 +23,10 @@ if (config.env === 'development') {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(cookieParser());
 app.use(compress());
 app.use(methodOverride());
-
 app.use(helmet());
-
 app.use(cors());
 
 if (config.env === 'development') {
