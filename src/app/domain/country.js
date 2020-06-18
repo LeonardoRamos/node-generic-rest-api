@@ -2,7 +2,6 @@ import Sequelize from 'sequelize';
 import BaseEntity from './core/base.entity';
 
 class CountryDefinition extends BaseEntity {
-    
     constructor() {
         super();
         
@@ -10,7 +9,6 @@ class CountryDefinition extends BaseEntity {
             type: Sequelize.STRING
         };
     }
-    
 }
 
 const countryDefinition = new CountryDefinition();
