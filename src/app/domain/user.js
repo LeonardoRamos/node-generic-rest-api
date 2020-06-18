@@ -1,8 +1,7 @@
 import Sequelize from 'sequelize';
 import BaseEntity from './core/base.entity';
 
-class UserDefinition extends BaseEntity {
-    
+class UserDefinition extends BaseEntity { 
     constructor() {
         super();
         
@@ -23,7 +22,6 @@ class UserDefinition extends BaseEntity {
             allowNull: false
         };
     }
-    
 }
 
 const userDefinition = new UserDefinition();
