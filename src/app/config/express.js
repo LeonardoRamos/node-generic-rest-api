@@ -17,7 +17,7 @@ import ApiError from '../helpers/api.error';
 
 const app = express();
 
-if (config.env === 'development') {
+if (config.env === config.environments.development) {
     app.use(logger('dev'));
 }
 
@@ -29,7 +29,7 @@ app.use(methodOverride());
 app.use(helmet());
 app.use(cors());
 
-if (config.env === 'development') {
+if (config.env === config.environments.development) {
     expressWinston.requestWhitelist.push('body');
     expressWinston.responseWhitelist.push('body');
     app.use(expressWinston.logger({
@@ -66,7 +66,7 @@ app.use((req, res, next) => {
     return next(err);
 });
 
-if (config.env !== 'test') {
+if (config.env !== config.environments.test) {
     app.use(expressWinston.errorLogger({
         winstonInstance,
     }));
@@ -75,7 +75,7 @@ if (config.env !== 'test') {
 app.use(( err, req, res, next, ) =>
     res.status(err.status).json({
         message: err.isPublic ? err.message : httpStatus[err.status],
-        stack: config.env === 'development' ? err.stack : {},
+        stack: config.env === config.environments.development ? err.stack : {},
     }));
 
 export default app;

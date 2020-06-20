@@ -2,10 +2,17 @@ import Joi from '@hapi/joi';
 
 require('dotenv').config();
 
+const environments = { 
+    development: 'development', 
+    production: 'production',
+    test: 'test', 
+    provision: 'test' 
+};
+
 const envVarsSchema = Joi.object({
     NODE_ENV: Joi.any()
-        .valid(...['development', 'production', 'test', 'provision'])
-        .default('development'),
+        .valid(...Object.keys(environments))
+        .default(environments.development),
 
     PORT: Joi.number().default(9503),
 
@@ -40,6 +47,7 @@ if (error) {
 }
 
 const config = {
+    environments, 
     env: envVars.NODE_ENV,
     port: envVars.PORT,
     jwtSecret: envVars.JWT_SECRET,

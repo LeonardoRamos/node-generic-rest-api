@@ -16,7 +16,7 @@ let loggerConfig = {
     ]
 };
 
-if (config.env === 'production') {
+if (config.env === config.environments.production) {
     loggerConfig.transports.push(
         new winston.transports.File({ 
             handleExceptions: true,
