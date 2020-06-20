@@ -1,6 +1,7 @@
 import winston from 'winston';
+import config from './config';
 
-const logger = winston.createLogger({
+let loggerConfig = {
     format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.errors({ stack: true }),
@@ -13,6 +14,17 @@ const logger = winston.createLogger({
             handleExceptions: true 
         }),
     ]
-});
+};
+
+if (config.env === 'production') {
+    loggerConfig.transports.push(
+        new winston.transports.File({ 
+            handleExceptions: true,
+            filename: '/var/log/node/NodeGenericRestApi/nodeGenericApi.log'
+        })
+    );
+}
+
+const logger = winston.createLogger(loggerConfig);
 
 export default logger;
