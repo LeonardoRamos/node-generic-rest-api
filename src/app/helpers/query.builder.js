@@ -205,14 +205,14 @@ function buildWhere(filter, model, nestedModels) {
     while (currentExpression !== null && Object.keys(currentExpression).length > 0) {
         
         if (currentExpression.filterField !== null) {
-            let fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
-
+            let fieldModel = model;
             query.where = query.where || {};
 
             if (currentExpression.logicOperator && LogicOperator.OR.name === currentExpression.logicOperator.name) {
                 let conjunctionQuery = [];
 
                 do {
+                    fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
                     conjunctionQuery.push(buildWhereCondition(currentExpression.filterField, fieldModel));
                     currentExpression = currentExpression.filterExpression;
                 
@@ -228,6 +228,7 @@ function buildWhere(filter, model, nestedModels) {
                 query.where[Op.or] = query.where[Op.or].concat(conjunctionQuery);
 
             } else {
+                fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
                 query.where = { ...query.where, ...buildWhereCondition(currentExpression.filterField, fieldModel) };
             }
         }

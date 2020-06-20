@@ -36,7 +36,7 @@ if (config.env === 'development') {
         winstonInstance,
         meta: true, 
         msg: 'HTTP {{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms',
-        colorStatus: true
+        colorize: true
     }));
 }
 
