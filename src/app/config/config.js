@@ -2,12 +2,8 @@ import Joi from '@hapi/joi';
 
 require('dotenv').config();
 
-const environments = { 
-    development: 'development', 
-    production: 'production',
-    test: 'test', 
-    provision: 'test' 
-};
+const environments = [ 'development', 'production', 'test', 'provision' ]
+    .reduce((configEnvs, env, index, envs) => ({ ...configEnvs, ...{ [envs[index]]: env} }), {});
 
 const envVarsSchema = Joi.object({
     NODE_ENV: Joi.any()
