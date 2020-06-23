@@ -89,6 +89,11 @@ module.exports = class ApiRestController {
                 params: Joi.object({
                     slug: Joi.string().hex().required(),
                 })
+            },
+            remove: {
+                params: Joi.object({
+                    slug: Joi.string().hex().required(),
+                })
             }
         };
     }

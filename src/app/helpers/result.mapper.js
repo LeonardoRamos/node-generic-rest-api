@@ -51,25 +51,23 @@ function formatAggregateFields(row, aggregation, sqlFunction) {
     }
 }
 
-function hideNestedFields(fieldValue) {
-    if (fieldValue !== null && typeof fieldValue === 'object') {
-        hideFields(fieldValue);
-
-    } else if (Array.isArray(fieldValue)) {
-        fieldValue.forEach((row) => {
-            hideFields(row);
-        });
-    }
-}
-
 function hideFields(row) {
-    let fields = Object.keys(row).forEach((field) => {
+    Object.keys(row).forEach((field) => {
         if (field === 'id' || field.startsWith('id_') || row[field] === null) {
             delete row[field];
         }
         
         if (!isAggregationField(field)) {
-            hideNestedFields(row[field]);
+            let fieldValue = row[field];
+            
+            if (fieldValue !== null && typeof fieldValue === 'object') {
+                hideFields(fieldValue);
+        
+            } else if (Array.isArray(fieldValue)) {
+                fieldValue.forEach((nestedRow) => {
+                    hideFields(nestedRow);
+                });
+            }
         }
     });
 }

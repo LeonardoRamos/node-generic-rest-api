@@ -25,7 +25,9 @@ router
             validate(paramValidation.update) 
         ], 
         userController.update)
-    .delete(userController.remove);
+    .delete(
+        validate(paramValidation.remove), 
+        userController.remove);
 
 router.param('slug', userController.getBySlug);
 
