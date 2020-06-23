@@ -55,12 +55,11 @@ function hideFields(row) {
     Object.keys(row).forEach((field) => {
         if (field === 'id' || field.startsWith('id_') || row[field] === null) {
             delete row[field];
-        }
         
-        if (!isAggregationField(field)) {
+        } else if (!isAggregationField(field)) {
             let fieldValue = row[field];
             
-            if (fieldValue !== null && typeof fieldValue === 'object') {
+            if (typeof fieldValue === 'object') {
                 hideFields(fieldValue);
         
             } else if (Array.isArray(fieldValue)) {
