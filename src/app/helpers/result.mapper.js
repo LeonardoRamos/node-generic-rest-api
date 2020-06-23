@@ -14,7 +14,7 @@ function mapResulRecords(result, requestQuery) {
         formatAggregateFields(row, aggregation, AggregateFunction.COUNT.function);
         formatAggregateFields(row, aggregation, AggregateFunction.AVG.function);
 
-        removeField(row);
+        hideFields(row);
 
         return row;
     });
@@ -51,25 +51,25 @@ function formatAggregateFields(row, aggregation, sqlFunction) {
     }
 }
 
-function maskNestedObject(fieldValue) {
+function hideNestedFields(fieldValue) {
     if (fieldValue !== null && typeof fieldValue === 'object') {
-        removeField(fieldValue)
+        hideFields(fieldValue);
 
     } else if (Array.isArray(fieldValue)) {
         fieldValue.forEach((row) => {
-            removeField(row);
-        })
+            hideFields(row);
+        });
     }
 }
 
-function removeField(row) {
+function hideFields(row) {
     let fields = Object.keys(row).forEach((field) => {
         if (field === 'id' || field.startsWith('id_') || row[field] === null) {
             delete row[field];
         }
         
         if (!isAggregationField(field)) {
-            maskNestedObject(row[field]);
+            hideNestedFields(row[field]);
         }
     });
 }
