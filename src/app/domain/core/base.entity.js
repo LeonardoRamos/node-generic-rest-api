@@ -36,7 +36,7 @@ module.exports = class BaseEntity {
     }
 
     toJSON() {
-        let attributes = {...{}, ...this.get()};
+        let attributes = { ...{}, ...this.get() };
 
         Object.keys(attributes).forEach(key => 
             (key === 'id' || key.startsWith('id_') || attributes[key] === null) && delete attributes[key]
