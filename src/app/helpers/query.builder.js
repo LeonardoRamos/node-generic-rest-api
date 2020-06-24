@@ -224,12 +224,13 @@ function buildWhere(filter, model, nestedModels) {
                     conjunctionQuery.push(buildWhereCondition(currentExpression.filterField, fieldModel));
                 }
 
-                query.where[Op.or] = query.where[Op.or] || [];
-                query.where[Op.or] = query.where[Op.or].concat(conjunctionQuery);
+                query.where[Op.and] = query.where[Op.and] || [];
+                query.where[Op.and].push({ [Op.or]: conjunctionQuery });
 
             } else {
                 fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
-                query.where = { ...query.where, ...buildWhereCondition(currentExpression.filterField, fieldModel) };
+                query.where[Op.and] = query.where[Op.and] || [];
+                query.where[Op.and].push(buildWhereCondition(currentExpression.filterField, fieldModel)); 
             }
         }
         
