@@ -76,14 +76,20 @@ function isAggregationField(field) {
             || field === AggregateFunction.COUNT.function;
 }
 
-function mapResultMetadata(query, result) {
+function mapResultMetadata(query, result, requestQuery) {
     let metadata = {
-        pageOffset: query.offset,
-        pageSize: query.limit
+        pageOffset: query.offset
     };
 
     if (!query.group) {
-        metadata.count = +result.count;
+        metadata.totalCount = +result.count;
+
+        if (queryParser.hasValidAggregateFunction(requestQuery)) {
+            metadata.pageSize = metadata.totalCount;
+        } else {
+            metadata.pageSize = query.limit;
+        }
+
         return metadata;
     }
     
@@ -93,7 +99,13 @@ function mapResultMetadata(query, result) {
         count += +result.count[i].count;
     }
 
-    metadata.count = count;
+    metadata.totalCount = count;
+
+    if (queryParser.hasValidAggregateFunction(requestQuery)) {
+        metadata.pageSize = metadata.totalCount;
+    } else {
+        metadata.pageSize = query.limit;
+    }
 
     return metadata;
 }

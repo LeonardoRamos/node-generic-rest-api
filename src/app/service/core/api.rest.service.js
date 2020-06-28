@@ -27,7 +27,7 @@ module.exports = class ApiRestService {
 
         return {
             records: resultMapper.mapResulRecords(result, requestQuery),
-            metadata: resultMapper.mapResultMetadata(query, result)
+            metadata: resultMapper.mapResultMetadata(query, result, requestQuery)
         };
     }
 
