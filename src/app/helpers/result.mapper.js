@@ -27,7 +27,6 @@ function formatAggregateFields(row, aggregation, sqlFunction) {
         let rootField = splittedField[0];
 
         row[sqlFunction] = row[sqlFunction] || {};
-        console.log(row[rootField]);
 
         if (row[sqlFunction][rootField]) {
             row[sqlFunction][rootField] = { ...row[sqlFunction][rootField], ...row[rootField] };
