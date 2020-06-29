@@ -25,27 +25,16 @@ function formatAggregateFields(row, aggregation, sqlFunction) {
         let splittedField = aggregation[sqlFunction][i].split('.');
 
         let rootField = splittedField[0];
-        let rowField = row[rootField];
-
-        let matchField = true;
-
-        for (let j = 1; j < splittedField.length; j++) {
-            let subField = splittedField[j];
-
-            if (rowField[subField]) {
-                rowField = rowField[subField];
-            } else {
-                matchField = false;
-                break;
-            }
-        }
-
-        if (typeof rowField === 'object') {
-            matchField = false;
-        }
 
         row[sqlFunction] = row[sqlFunction] || {};
-        row[sqlFunction][rootField] = row[rootField];
+        console.log(row[rootField]);
+
+        if (row[sqlFunction][rootField]) {
+            row[sqlFunction][rootField] = { ...row[sqlFunction][rootField], ...row[rootField] };
+        
+        } else {
+            row[sqlFunction][rootField] = row[rootField];
+        }
 
         delete row[rootField];
     }
