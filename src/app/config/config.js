@@ -34,7 +34,7 @@ const envVarsSchema = Joi.object({
         .optional(),
 
     LOG_DIR: Joi.string()
-        .description('Path for log file')
+        .description('Log file directory')
         .default('../../../logs/nodeGenericApi.log')
 
 })
