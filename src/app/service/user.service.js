@@ -14,9 +14,7 @@ module.exports = class UserService extends ApiRestService {
 
     async findByEmail(email) {
         return await User.findOne({ 
-            where: { 
-                email 
-            } 
+            where: { email } 
         });
     }
 
