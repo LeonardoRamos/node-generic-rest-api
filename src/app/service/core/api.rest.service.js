@@ -15,9 +15,7 @@ module.exports = class ApiRestService {
 
     async findBySlug(slug) {
         return await this.model.findOne({ 
-            where: { 
-                slug 
-            } 
+            where: { slug } 
         });   
     }
 
