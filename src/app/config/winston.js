@@ -20,7 +20,7 @@ if (config.env === config.environments.production) {
     loggerConfig.transports.push(
         new winston.transports.File({ 
             handleExceptions: true,
-            filename: '/var/log/node/NodeGenericRestApi/nodeGenericApi.log'
+            filename: config.logDirectory
         })
     );
 }
