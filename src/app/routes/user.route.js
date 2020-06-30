@@ -10,7 +10,9 @@ const paramValidation = userController.paramValidation();
 
 router
     .route('/')
-    .get(userController.list)
+    .get(
+        expressJwt({ secret: config.jwtSecret }),
+        userController.list)
     .post([ 
             expressJwt({ secret: config.jwtSecret }), 
             validate(paramValidation.insert) 
@@ -19,14 +21,18 @@ router
 
 router
     .route('/:slug')
-    .get(userController.get)
+    .get(
+        expressJwt({ secret: config.jwtSecret }),
+        userController.get)
     .put([
             expressJwt({ secret: config.jwtSecret }), 
             validate(paramValidation.update) 
         ], 
         userController.update)
-    .delete(
-        validate(paramValidation.remove), 
+    .delete([
+            expressJwt({ secret: config.jwtSecret }),
+            validate(paramValidation.remove)
+        ], 
         userController.remove);
 
 router.param('slug', userController.getBySlug);

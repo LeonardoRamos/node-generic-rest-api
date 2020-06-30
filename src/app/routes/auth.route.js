@@ -8,6 +8,8 @@ const paramValidation = authController.paramValidation();
 
 router
     .route('/login')
-    .post(validate(paramValidation.login), authController.login);
+    .post(
+        validate(paramValidation.login), 
+        authController.login);
 
 export default router;
