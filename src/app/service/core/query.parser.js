@@ -1,6 +1,6 @@
-import LogicOperator from '../domain/core/filter/logic.operator.enum';
-import FilterOperator from '../domain/core/filter/filter.operator.enum';
-import SortOrder from '../domain/core/filter/sort.order.enum';
+import LogicOperator from '../../domain/core/filter/logic.operator.enum';
+import FilterOperator from '../../domain/core/filter/filter.operator.enum';
+import SortOrder from '../../domain/core/filter/sort.order.enum';
 import Sequelize from 'sequelize';
 
 const DEFAULT_OFFSET = 0;

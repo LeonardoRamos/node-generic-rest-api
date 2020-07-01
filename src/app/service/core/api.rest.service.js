@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import Sequelize from 'sequelize';
-import queryBuilder from '../../helpers/query.builder';
-import resultMapper from '../../helpers/result.mapper';
+import queryBuilder from './query.builder';
+import resultMapper from './mapper/result.mapper';
 
 module.exports = class ApiRestService {
     

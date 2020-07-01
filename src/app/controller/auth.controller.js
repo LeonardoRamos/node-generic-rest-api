@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { Joi } from 'express-validation';
 import httpStatus from 'http-status';
-import ApiError from '../helpers/api.error';
+import ApiError from '../error/api.error';
 import config from '../config/config';
 import UserService from '../service/user.service';
 

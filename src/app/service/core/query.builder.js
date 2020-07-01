@@ -1,6 +1,6 @@
-import LogicOperator from '../domain/core/filter/logic.operator.enum';
-import AggregateFunction from '../domain/core/filter/aggregate.function.enum';
-import FilterOperator from '../domain/core/filter/filter.operator.enum';
+import LogicOperator from '../../domain/core/filter/logic.operator.enum';
+import AggregateFunction from '../../domain/core/filter/aggregate.function.enum';
+import FilterOperator from '../../domain/core/filter/filter.operator.enum';
 import queryParser from './query.parser';
 import Sequelize from 'sequelize';
 

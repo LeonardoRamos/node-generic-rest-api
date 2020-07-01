@@ -1,5 +1,5 @@
-import queryParser from './query.parser';
-import AggregateFunction from '../domain/core/filter/aggregate.function.enum';
+import queryParser from '../query.parser';
+import AggregateFunction from '../../../domain/core/filter/aggregate.function.enum';
 
 function mapResulRecords(result, requestQuery) {
     return result.rows.map((row) => {

@@ -33,8 +33,8 @@ const envVarsSchema = Joi.object({
         .default('postgres')
         .optional(),
 
-    LOG_DIR: Joi.string()
-        .description('Log file directory')
+        LOG_FILE: Joi.string()
+        .description('Log file path')
         .default('../../../logs/nodeGenericApi.log')
 
 })
@@ -52,7 +52,7 @@ const config = {
     port: envVars.PORT,
     jwtSecret: envVars.JWT_SECRET,
     jwtExpiration: envVars.JWT_EXPIRATION,
-    logDirectory: envVars.LOG_DIR,
+    logFile: envVars.LOG_FILE,
     postgres: {
         db: envVars.PG_DB,
         port: envVars.PG_PORT,

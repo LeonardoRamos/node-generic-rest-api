@@ -10,10 +10,10 @@ import expressWinston from 'express-winston';
 import expressValidation from 'express-validation';
 import helmet from 'helmet';
 import winstonInstance from './winston';
-import baseRoutes from '../routes/core/index.route';
-import apiRoutes from '../routes/core/api.route';
+import baseRoutes from '../routes/base/base.route';
+import apiRoutes from '../routes/api/api.route';
 import config from './config';
-import ApiError from '../helpers/api.error';
+import ApiError from '../error/api.error';
 
 const app = express();
 

@@ -20,7 +20,7 @@ if (config.env === config.environments.production) {
     loggerConfig.transports.push(
         new winston.transports.File({ 
             handleExceptions: true,
-            filename: config.logDirectory
+            filename: config.logFile
         })
     );
 }
