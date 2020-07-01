@@ -33,7 +33,7 @@ const envVarsSchema = Joi.object({
         .default('postgres')
         .optional(),
 
-        LOG_FILE: Joi.string()
+    LOG_FILE: Joi.string()
         .description('Log file path')
         .default('../../../logs/nodeGenericApi.log')
 

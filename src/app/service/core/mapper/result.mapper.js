@@ -44,7 +44,7 @@ function hideFields(row) {
         if (field === 'id' || field.startsWith('id_') || row[field] === null) {
             delete row[field];
         
-        } else if (!isAggregationField(field)) {
+        } else if (!AggregateFunction.isAggregationFunction(field)) {
             let fieldValue = row[field];
             
             if (typeof fieldValue === 'object') {
@@ -57,11 +57,6 @@ function hideFields(row) {
             }
         }
     });
-}
-
-function isAggregationField(field) {
-    return field === AggregateFunction.SUM.function || field === AggregateFunction.AVG.function 
-            || field === AggregateFunction.COUNT.function;
 }
 
 function mapResultMetadata(query, result, requestQuery) {

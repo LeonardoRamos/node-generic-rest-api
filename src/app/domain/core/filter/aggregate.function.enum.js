@@ -21,4 +21,9 @@ const AggregateFunction = {
     }
 }
 
+AggregateFunction.isAggregationFunction = functionName => {
+    return functionName === AggregateFunction.SUM.function || functionName === AggregateFunction.AVG.function 
+        || functionName === AggregateFunction.COUNT.function;
+};
+
 export default AggregateFunction;

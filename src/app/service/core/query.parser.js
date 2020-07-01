@@ -8,10 +8,10 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
 
 function hasValidAggregateFunction(requestQuery) {
-    return (requestQuery.sum != null && '' !== requestQuery.sum) || 
-            (requestQuery.avg != null && '' !== requestQuery.avg) || 
-            (requestQuery.count != null && '' !== requestQuery.count) ||
-            (requestQuery.countDistinct != null && '' !== requestQuery.countDistinct);
+    return (requestQuery.sum !== null && requestQuery.sum !== undefined && '' !== requestQuery.sum) || 
+            (requestQuery.avg !== null && requestQuery.avg !== undefined && '' !== requestQuery.avg) || 
+            (requestQuery.count !== null && requestQuery.count !== undefined && '' !== requestQuery.count) ||
+            (requestQuery.countDistinct !== null && requestQuery.countDistinct !== undefined && '' !== requestQuery.countDistinct);
 }
 
 function getOffset(requestQuery) {
@@ -35,7 +35,7 @@ function getLimit(requestQuery) {
 }
 
 function parseSeletor(seletor) {
-    if (!seletor) {
+    if (seletor === null || seletor === undefined || '' === seletor) {
         return [];
     }
 
@@ -43,7 +43,7 @@ function parseSeletor(seletor) {
 }
 
 function parseSortOrder(sort) {
-    if (!sort) {
+    if (sort === null || sort === undefined || '' === sort) {
         return [];
     }
 
