@@ -2,14 +2,14 @@ import queryParser from '../query.parser';
 import AggregateFunction from '../../../domain/core/filter/aggregate.function.enum';
 
 function mapResulRecords(result, requestQuery) {
-    return result.rows.map((row) => {
-        let aggregation = {
-            sum: queryParser.parseSeletor(requestQuery.sum),
-            avg: queryParser.parseSeletor(requestQuery.avg),
-            count: queryParser.parseSeletor(requestQuery.count)
-                .concat(queryParser.parseSeletor(requestQuery.countDistinct))
-        };
+    let aggregation = {
+        sum: queryParser.parseSeletor(requestQuery.sum),
+        avg: queryParser.parseSeletor(requestQuery.avg),
+        count: queryParser.parseSeletor(requestQuery.count)
+            .concat(queryParser.parseSeletor(requestQuery.countDistinct))
+    };
 
+    return result.rows.map((row) => {
         formatAggregateFields(row, aggregation, AggregateFunction.SUM.function);
         formatAggregateFields(row, aggregation, AggregateFunction.COUNT.function);
         formatAggregateFields(row, aggregation, AggregateFunction.AVG.function);
@@ -28,7 +28,7 @@ function formatAggregateFields(row, aggregation, sqlFunction) {
 
         row[sqlFunction] = row[sqlFunction] || {};
 
-        if (row[sqlFunction][rootField]) {
+        if (row[sqlFunction][rootField] !== undefined) {
             row[sqlFunction][rootField] = { ...row[sqlFunction][rootField], ...row[rootField] };
         
         } else {
@@ -80,14 +80,8 @@ function mapResultMetadata(query, result, requestQuery) {
 
         return metadata;
     }
-    
-    let count = 0;
 
-    for (let i = 0; i < result.count.length; i++) {
-        count += +result.count[i].count;
-    }
-
-    metadata.totalCount = count;
+    metadata.totalCount = mapGroupCount(result);
 
     if (queryParser.hasValidAggregateFunction(requestQuery)) {
         metadata.pageSize = metadata.totalCount;
@@ -96,6 +90,16 @@ function mapResultMetadata(query, result, requestQuery) {
     }
 
     return metadata;
+}
+
+function mapGroupCount(result) {
+    let count = 0;
+    
+    for (let i = 0; i < result.count.length; i++) {
+        count += +result.count[i].count;
+    }
+
+    return count;
 }
 
 export default { mapResulRecords, mapResultMetadata };
