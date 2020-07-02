@@ -1,5 +1,5 @@
 import express from 'express';
-import apiPackage from '../../../../package.json';
+import appPackage from '../../../../package.json';
 import { sequelize } from '../../config/sequelize';
 
 const router = express.Router(); 
@@ -32,9 +32,9 @@ router.get('/health', (req, res) => {
 
 router.get('/info', (req, res) => {
     res.send({
-        name: apiPackage.name,
-        description: apiPackage.description,
-        version: apiPackage.version
+        name: appPackage.name,
+        description: appPackage.description,
+        version: appPackage.version
     })
 });
 
