@@ -11,6 +11,7 @@ import expressValidation from 'express-validation';
 import helmet from 'helmet';
 import winstonInstance from './winston';
 import baseRoutes from '../routes/base/base.route';
+import manageRoutes from '../routes/base/manage.route';
 import apiRoutes from '../routes/api/api.route';
 import config from './config';
 import ApiError from '../error/api.error';
@@ -41,6 +42,7 @@ if (config.env === config.environments.development) {
 }
 
 app.use(baseRoutes);
+app.use('/manage', manageRoutes);
 app.use('/v1', apiRoutes);
 
 app.use((err, req, res, next) => {

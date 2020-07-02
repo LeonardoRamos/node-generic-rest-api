@@ -1,6 +1,6 @@
 {
     "name": "node-generic-rest-api",
-    "version": "0.0.1",
+    "version": "0.0.1-SNAPSHOT",
     "description": "NodeGenericRestApi",
     "author": "Leonardo Ramos <leoslramos@gmail.com>",
     "main": "./src/app/main.js",
