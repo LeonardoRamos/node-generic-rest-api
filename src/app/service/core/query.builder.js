@@ -3,6 +3,7 @@ import AggregateFunction from '../../domain/core/filter/aggregate.function.enum'
 import FilterOperator from '../../domain/core/filter/filter.operator.enum';
 import queryParser from './query.parser';
 import Sequelize from 'sequelize';
+import _ from 'lodash';
 
 const Op = Sequelize.Op;
 
@@ -82,37 +83,33 @@ function buildAggregations(requestQuery, model, nestedModels) {
         return query;
     }
 
-    let aggregation = buildFunctionProjection(sum, AggregateFunction.SUM.sqlFunction, model, nestedModels);
-    aggregation = aggregation.concat(buildFunctionProjection(avg, AggregateFunction.AVG.sqlFunction, model, nestedModels));
-    aggregation = aggregation.concat(buildFunctionProjection(count, AggregateFunction.COUNT.sqlFunction, model, nestedModels));
-    aggregation = aggregation.concat(buildFunctionProjection(countDistinct, AggregateFunction.COUNT_DISTINCT.sqlFunction, model, nestedModels));
-    aggregation = aggregation.concat(buildFunctionProjection(groupBy, AggregateFunction.GROUP_BY.sqlFunction, model, nestedModels));
+    let aggregation = buildFunctionProjection(sum, AggregateFunction.SUM, model, nestedModels);
+    aggregation = aggregation.concat(buildFunctionProjection(avg, AggregateFunction.AVG, model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(count, AggregateFunction.COUNT, model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(countDistinct, AggregateFunction.COUNT_DISTINCT, model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(groupBy, AggregateFunction.GROUP_BY, model, nestedModels));
 
     query.attributes = aggregation;
 
     return query;
 }
 
-function buildFunctionProjection(functionFields, sqlFunction, model, nestedModels) {
+function buildFunctionProjection(functionFields, aggregateFunction, model, nestedModels) {
     let aggregation = [];
 
     for (let i = 0; i < functionFields.length; i++) {
         let nestedModel = getFieldModel(model, nestedModels, functionFields[i]);
         let columnField = getLiteralField(functionFields[i], nestedModel);
 
-        if (sqlFunction === AggregateFunction.COUNT_DISTINCT.sqlFunction) {
-            aggregation.push(
-                [ Sequelize.literal(sqlFunction + '(' + columnField + '))'), functionFields[i] ]
-            );
-
-        } else if (sqlFunction === AggregateFunction.GROUP_BY.sqlFunction) {
+        if (aggregateFunction.sqlFunction === AggregateFunction.GROUP_BY.sqlFunction) {
             aggregation.push(
                 [ Sequelize.literal(columnField), functionFields[i] ]
             ); 
 
         } else {
+            let sqlFunctionCompiled = _.template(aggregateFunction.sqlFunctionTemplate);
             aggregation.push(
-                [ Sequelize.literal(sqlFunction + '(' + columnField + ')'), functionFields[i] ]
+                [ Sequelize.literal(sqlFunctionCompiled({ columnField })), functionFields[i] ]
             );            
         }
     }

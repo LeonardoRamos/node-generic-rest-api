@@ -1,23 +1,28 @@
 const AggregateFunction = {
     'SUM': {
         'name': 'SUM',
-        'sqlFunction': 'sum'
+        'sqlFunction': 'sum',
+        'sqlFunctionTemplate': 'sum( ${ columnField } )'
     },
     'AVG': {
         'name': 'AVG',
-        'sqlFunction': 'avg'
+        'sqlFunction': 'avg',
+        'sqlFunctionTemplate': 'avg( ${ columnField } )'
     },
     'COUNT': {
         'name': 'COUNT',
-        'sqlFunction': 'count'
+        'sqlFunction': 'count',
+        'sqlFunctionTemplate': 'count( ${ columnField } )'
     },
     'COUNT_DISTINCT': {
         'name': 'COUNT_DISTINCT',
-        'sqlFunction': 'count(distinct'
+        'sqlFunction': 'countDistinct',
+        'sqlFunctionTemplate': 'count(distinct( ${ columnField } ))'
     },
     'GROUP_BY': {
         'name': 'GROUP_BY',
-        'sqlFunction': 'groupBy'
+        'sqlFunction': 'groupBy',
+        'sqlFunctionTemplate': 'groupBy'
     }
 }
 
