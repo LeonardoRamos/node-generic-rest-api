@@ -1,33 +1,16 @@
 import express from 'express';
 import appPackage from '../../../../package.json';
-import { sequelize } from '../../config/sequelize';
-import dialectMapper from '../../helper/dialect.mapper'
+import databaseHealth from '../../config/database.health'
 
 const router = express.Router(); 
 
-router.get('/health', (req, res) => {
-    let healthStatus = {
-        status: 'UP',
-        components: {
-            db: {
-                status: 'UP',
-                details: {
-                    database: dialectMapper.mapDialect(sequelize.options.dialect)
-                }
-            }
-        }
-    };
+router.get('/health', async (req, res) => {
+    let db = await databaseHealth.doHealthCheck();
 
-    sequelize
-        .authenticate()
-            .then(() => {
-                res.send(healthStatus)
-            })
-            .catch(err => {
-                healthStatus.status = 'DOWN';
-                healthStatus.components.db.status = 'DOWN';
-                res.send(healthStatus)
-            });
+    res.send({
+        status: db.status === 'UP' ? 'UP' : 'DOWN',
+        components: { db }
+    });
 });
 
 router.get('/info', (req, res) => {
