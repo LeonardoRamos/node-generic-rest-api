@@ -101,7 +101,7 @@ function buildFunctionProjection(functionFields, aggregateFunction, model, neste
         let nestedModel = getFieldModel(model, nestedModels, functionFields[i]);
         let columnField = getLiteralField(functionFields[i], nestedModel);
 
-        if (aggregateFunction.sqlFunction === AggregateFunction.GROUP_BY.sqlFunction) {
+        if (aggregateFunction.name === AggregateFunction.GROUP_BY.name) {
             aggregation.push(
                 [ Sequelize.literal(columnField), functionFields[i] ]
             ); 
