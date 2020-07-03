@@ -12,15 +12,13 @@ async function doHealthCheck() {
     try {
         await sequelize.authenticate();
         dbHealth.status = 'UP';
-        
-        return dbHealth;
 
     } catch (err) {
         winstonInstance.error(err);
         dbHealth.status = 'DOWN';
-        
-        return dbHealth;
     }
+
+    return dbHealth;
 }
 
 function mapDialect(dialect) {

@@ -1,11 +1,11 @@
 import express from 'express';
 import appPackage from '../../../../package.json';
-import databaseHealth from '../../config/database.health'
+import dbHealth from '../../config/db.health'
 
 const router = express.Router(); 
 
 router.get('/health', async (req, res) => {
-    let db = await databaseHealth.doHealthCheck();
+    let db = await dbHealth.doHealthCheck();
 
     res.send({
         status: db.status === 'UP' ? 'UP' : 'DOWN',
