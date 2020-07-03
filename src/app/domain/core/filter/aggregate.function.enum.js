@@ -1,29 +1,29 @@
 const AggregateFunction = {
     'SUM': {
         'name': 'SUM',
-        'function': 'sum'
+        'sqlFunction': 'sum'
     },
     'AVG': {
         'name': 'AVG',
-        'function': 'avg'
+        'sqlFunction': 'avg'
     },
     'COUNT': {
         'name': 'COUNT',
-        'function': 'count'
+        'sqlFunction': 'count'
     },
     'COUNT_DISTINCT': {
         'name': 'COUNT_DISTINCT',
-        'function': 'count(distinct'
+        'sqlFunction': 'count(distinct'
     },
     'GROUP_BY': {
         'name': 'GROUP_BY',
-        'function': 'groupBy'
+        'sqlFunction': 'groupBy'
     }
 }
 
 AggregateFunction.isAggregationFunction = functionName => {
-    return functionName === AggregateFunction.SUM.function || functionName === AggregateFunction.AVG.function 
-        || functionName === AggregateFunction.COUNT.function;
+    return functionName === AggregateFunction.SUM.sqlFunction || functionName === AggregateFunction.AVG.sqlFunction 
+        || functionName === AggregateFunction.COUNT.sqlFunction;
 };
 
 export default AggregateFunction;

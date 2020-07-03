@@ -82,11 +82,11 @@ function buildAggregations(requestQuery, model, nestedModels) {
         return query;
     }
 
-    let aggregation = buildFunctionProjection(sum, AggregateFunction.SUM.function, model, nestedModels);
-    aggregation = aggregation.concat(buildFunctionProjection(avg, AggregateFunction.AVG.function, model, nestedModels));
-    aggregation = aggregation.concat(buildFunctionProjection(count, AggregateFunction.COUNT.function, model, nestedModels));
-    aggregation = aggregation.concat(buildFunctionProjection(countDistinct, AggregateFunction.COUNT_DISTINCT.function, model, nestedModels));
-    aggregation = aggregation.concat(buildFunctionProjection(groupBy, AggregateFunction.GROUP_BY.function, model, nestedModels));
+    let aggregation = buildFunctionProjection(sum, AggregateFunction.SUM.sqlFunction, model, nestedModels);
+    aggregation = aggregation.concat(buildFunctionProjection(avg, AggregateFunction.AVG.sqlFunction, model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(count, AggregateFunction.COUNT.sqlFunction, model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(countDistinct, AggregateFunction.COUNT_DISTINCT.sqlFunction, model, nestedModels));
+    aggregation = aggregation.concat(buildFunctionProjection(groupBy, AggregateFunction.GROUP_BY.sqlFunction, model, nestedModels));
 
     query.attributes = aggregation;
 
@@ -100,12 +100,12 @@ function buildFunctionProjection(functionFields, sqlFunction, model, nestedModel
         let nestedModel = getFieldModel(model, nestedModels, functionFields[i]);
         let columnField = getLiteralField(functionFields[i], nestedModel);
 
-        if (sqlFunction === AggregateFunction.COUNT_DISTINCT.function) {
+        if (sqlFunction === AggregateFunction.COUNT_DISTINCT.sqlFunction) {
             aggregation.push(
                 [ Sequelize.literal(sqlFunction + '(' + columnField + '))'), functionFields[i] ]
             );
 
-        } else if (sqlFunction === AggregateFunction.GROUP_BY.function) {
+        } else if (sqlFunction === AggregateFunction.GROUP_BY.sqlFunction) {
             aggregation.push(
                 [ Sequelize.literal(columnField), functionFields[i] ]
             ); 

@@ -10,9 +10,9 @@ function mapResulRecords(result, requestQuery) {
     };
 
     return result.rows.map((row) => {
-        formatAggregateFields(row, aggregation, AggregateFunction.SUM.function);
-        formatAggregateFields(row, aggregation, AggregateFunction.COUNT.function);
-        formatAggregateFields(row, aggregation, AggregateFunction.AVG.function);
+        formatAggregateFields(row, aggregation, AggregateFunction.SUM.sqlFunction);
+        formatAggregateFields(row, aggregation, AggregateFunction.COUNT.sqlFunction);
+        formatAggregateFields(row, aggregation, AggregateFunction.AVG.sqlFunction);
 
         hideFields(row);
 
