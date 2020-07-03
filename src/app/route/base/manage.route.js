@@ -1,6 +1,7 @@
 import express from 'express';
 import appPackage from '../../../../package.json';
 import { sequelize } from '../../config/sequelize';
+import dialectMapper from '../../helper/dialect.mapper'
 
 const router = express.Router(); 
 
@@ -11,8 +12,7 @@ router.get('/health', (req, res) => {
             db: {
                 status: 'UP',
                 details: {
-                    database: sequelize.options.dialect,
-                    validationQuery: 'SELECT 1+1 AS result'
+                    database: dialectMapper.mapDialect(sequelize.options.dialect)
                 }
             }
         }

@@ -10,9 +10,9 @@ import expressWinston from 'express-winston';
 import expressValidation from 'express-validation';
 import helmet from 'helmet';
 import winstonInstance from './winston';
-import authRoute from '../routes/auth.route';
-import manageRoutes from '../routes/base/manage.route';
-import apiRoutes from '../routes/api/api.route';
+import authRoute from '../route/auth.route';
+import manageRoutes from '../route/base/manage.route';
+import apiRoutes from '../route/api/api.route';
 import config from './config';
 import ApiError from '../error/api.error';
 
