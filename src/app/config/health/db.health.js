@@ -1,11 +1,11 @@
-import { sequelize } from './sequelize';
-import winstonInstance from './winston';
+import { sequelize } from '../sequelize';
+import winstonInstance from '../winston';
 
 async function doHealthCheck() {
     let dbHealth = {
         status: 'UNKNOWN',
         details: {
-            database: mapDialect(sequelize.options.dialect)
+            database: mapDialectToProduct(sequelize.options.dialect)
         }
     };
 
@@ -21,7 +21,7 @@ async function doHealthCheck() {
     return dbHealth;
 }
 
-function mapDialect(dialect) {
+function mapDialectToProduct(dialect) {
     if (dialect === 'postgres') return 'PostgreSQL';
     else if (dialect === 'mysql') return 'MySQL'
     else if (dialect === 'mariadb') return 'MariaDB'
