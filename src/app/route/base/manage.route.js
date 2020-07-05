@@ -8,7 +8,7 @@ router.get('/health', async (req, res) => {
     let status = 'UP';
     
     let db = await dbHealth.doHealthCheck();
-    status = db.status === 'UP' ? 'UP' : 'DOWN'
+    status = db.status === 'UP' ? status : 'DOWN'
 
     res.send({
         status,
