@@ -61,7 +61,7 @@ function parseSortOrder(sort) {
     return orderFields;
 }
 
-function parseRequestSymbols(requestQuery) {
+function parseSymbols(requestQuery) {
     if (requestQuery.filter) {
         requestQuery.filter = requestQuery.filter.split('[').join('').split(']').join('');
         requestQuery.filter = requestQuery.filter.split(LogicOperator.AND.operatorAlias).join(LogicOperator.AND.operator);
@@ -245,6 +245,6 @@ export default {
     getOffset, 
     parseSeletor, 
     parseSortOrder, 
-    parseRequestSymbols, 
+    parseSymbols, 
     parseFilterExpressions 
 };
