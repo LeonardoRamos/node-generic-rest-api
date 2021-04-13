@@ -1,12 +1,12 @@
-import queryParser from '../query.parser';
+import requestParser from '../request.parser';
 import AggregateFunction from '../../../domain/core/filter/aggregate.function.enum';
 
 function mapResulRecords(result, requestQuery) {
     let aggregation = {
-        sum: queryParser.parseSeletor(requestQuery.sum),
-        avg: queryParser.parseSeletor(requestQuery.avg),
-        count: queryParser.parseSeletor(requestQuery.count)
-            .concat(queryParser.parseSeletor(requestQuery.countDistinct))
+        sum: requestParser.parseSeletor(requestQuery.sum),
+        avg: requestParser.parseSeletor(requestQuery.avg),
+        count: requestParser.parseSeletor(requestQuery.count)
+            .concat(requestParser.parseSeletor(requestQuery.countDistinct))
     };
 
     return result.rows.map((row) => {
@@ -67,7 +67,7 @@ function mapResultMetadata(query, result, requestQuery) {
     if (!query.group) {
         metadata.totalCount = +result.count;
 
-        if (queryParser.hasValidAggregateFunction(requestQuery)) {
+        if (requestParser.hasValidAggregateFunction(requestQuery)) {
             metadata.pageSize = metadata.totalCount;
         } else {
             metadata.pageSize = query.limit;
@@ -78,7 +78,7 @@ function mapResultMetadata(query, result, requestQuery) {
 
     metadata.totalCount = mapGroupCount(result);
 
-    if (queryParser.hasValidAggregateFunction(requestQuery)) {
+    if (requestParser.hasValidAggregateFunction(requestQuery)) {
         metadata.pageSize = metadata.totalCount;
     } else {
         metadata.pageSize = query.limit;
