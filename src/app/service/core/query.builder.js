@@ -1,19 +1,19 @@
 import LogicOperator from '../../domain/core/filter/logic.operator.enum';
 import AggregateFunction from '../../domain/core/filter/aggregate.function.enum';
 import FilterOperator from '../../domain/core/filter/filter.operator.enum';
-import queryParser from './query.parser';
+import requestParser from './request.parser';
 import Sequelize from 'sequelize';
 import _ from 'lodash';
 
 const Op = Sequelize.Op;
 
 function buildQuery(model, requestQuery) {
-    requestQuery = queryParser.parseRequestSymbols(requestQuery);
+    requestQuery = requestParser.parseSymbols(requestQuery);
     
     let nestedModels = getNestedModels(model);
     let query = buildWhere(requestQuery.filter, model, nestedModels);
     
-    if (queryParser.hasValidAggregateFunction(requestQuery)) {
+    if (requestParser.hasValidAggregateFunction(requestQuery)) {
         query = { ...query, ...buildAggregations(requestQuery, model, nestedModels) };
         query = { ...query, ...buildGroupBy(requestQuery.groupBy, model, nestedModels) };
 
@@ -24,8 +24,8 @@ function buildQuery(model, requestQuery) {
     query = { ...query, ...buildIncludes(requestQuery, model) };
     query = { ...query, ...buildOrder(requestQuery.sort, nestedModels, model) };
     
-    query.limit = queryParser.getLimit(requestQuery);
-    query.offset = queryParser.getOffset(requestQuery);
+    query.limit = requestParser.getLimit(requestQuery);
+    query.offset = requestParser.getOffset(requestQuery);
 
     query.raw = true;  
     query.mapToModel = true;
@@ -45,7 +45,7 @@ function buildIncludes(requestQuery, model, rootModel = model, query = {}) {
                     as: key,
                 };
 
-                if (queryParser.hasValidAggregateFunction(requestQuery)) {
+                if (requestParser.hasValidAggregateFunction(requestQuery)) {
                     associationInclude.attributes = [];
 
                 } else {
@@ -69,11 +69,11 @@ function buildIncludes(requestQuery, model, rootModel = model, query = {}) {
 }
 
 function buildAggregations(requestQuery, model, nestedModels) {
-    let sum = queryParser.parseSeletor(requestQuery.sum);
-    let avg = queryParser.parseSeletor(requestQuery.avg);
-    let count = queryParser.parseSeletor(requestQuery.count);
-    let countDistinct = queryParser.parseSeletor(requestQuery.countDistinct);
-    let groupBy = queryParser.parseSeletor(requestQuery.groupBy);
+    let sum = requestParser.parseSeletor(requestQuery.sum);
+    let avg = requestParser.parseSeletor(requestQuery.avg);
+    let count = requestParser.parseSeletor(requestQuery.count);
+    let countDistinct = requestParser.parseSeletor(requestQuery.countDistinct);
+    let groupBy = requestParser.parseSeletor(requestQuery.groupBy);
     
     let query = {};
 
@@ -118,7 +118,7 @@ function buildFunctionProjection(functionFields, aggregateFunction, model, neste
 }
 
 function buildProjections(projection, modelAlias = null) {
-    let projections = queryParser.parseSeletor(projection);
+    let projections = requestParser.parseSeletor(projection);
     let query = {};
 
     if (projections.length === 0) {
@@ -144,7 +144,7 @@ function buildProjections(projection, modelAlias = null) {
 }
 
 function buildGroupBy(groupBy, model, nestedModels) {
-    let groupByFields = queryParser.parseSeletor(groupBy);
+    let groupByFields = requestParser.parseSeletor(groupBy);
     let query = {};
 
     for (let i = 0; i < groupByFields.length; i++) {
@@ -164,7 +164,7 @@ function buildGroupBy(groupBy, model, nestedModels) {
 }
 
 function buildOrder(sort, nestedModels, model) {
-    let orderFields = queryParser.parseSortOrder(sort);
+    let orderFields = requestParser.parseSortOrder(sort);
     let query = {};
 
     for (let i = 0; i < orderFields.length; i++) {
@@ -196,7 +196,7 @@ function buildOrder(sort, nestedModels, model) {
 }
 
 function buildWhere(filter, model, nestedModels) {
-    let currentExpression = queryParser.parseFilterExpressions(filter);
+    let currentExpression = requestParser.parseFilterExpressions(filter);
     let query = {};
     
     while (currentExpression !== null && Object.keys(currentExpression).length > 0) {
