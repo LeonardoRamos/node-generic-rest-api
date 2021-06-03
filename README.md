@@ -6,7 +6,7 @@ API Rest developed using *NodeJs*. Its purpose is to serve as a lib to make it e
 ## Setting up
 
 To test the project locally, simply clone the repository and import into any IDE you may prefer.
-After that, you will need to run `npm install` and then run `yarn start`.
+After that, you will need to run `npm install`, after that, run `npm install --global yarn` and then run `yarn start`.
 
 
 ## API
