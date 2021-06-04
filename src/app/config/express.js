@@ -45,17 +45,19 @@ app.use('/manage', manageRoutes);
 app.use('/v1', apiRoutes);
 
 app.use((err, req, res, next) => {
-    if (err instanceof expressValidation.ValidationError) {
-        const unifiedErrorMessage = err.errors
-            .map(error => error.messages.join('. '))
-            .join(' and ');
-        const error = new ApiError(unifiedErrorMessage, err.status, true);
-    
-        return next(error);
-    
-    } else if (!(err instanceof ApiError)) {
+    if (!(err instanceof ApiError)) {
         winstonInstance.error(err);
-        const apiError = new ApiError(err.message, err.status, err.isPublic);
+        
+        let code = 'ERROR_CODE';
+        
+        if (err.name === 'UnauthorizedError') {
+            code = 'AUTH_ERROR_' + err.code.toUpperCase();
+        
+        } else if (err.code) {
+            code = err.code.toUpperCase();
+        }
+
+        const apiError = new ApiError(err.message, code, err.status, err.isPublic);
         return next(apiError);
     }
     
@@ -63,7 +65,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    const err = new ApiError('API not found', httpStatus.NOT_FOUND);
+    const err = new ApiError('API not found', 'API_NOT_FOUND', httpStatus.NOT_FOUND);
     return next(err);
 });
 
@@ -73,10 +75,28 @@ if (config.env !== config.environments.test) {
     }));
 }
 
-app.use(( err, req, res, next, ) =>
-    res.status(err.status).json({
-        message: err.isPublic ? err.message : httpStatus[err.status],
-        stack: config.env === config.environments.development ? err.stack : {},
-    }));
+app.use(( err, req, res, next, ) => {
+    if (err instanceof expressValidation.ValidationError) {
+        const errors = err.details.body
+            .map(error => {
+                return { 
+                    code: 'VALIDATION_ERROR_' + error.context.key.toUpperCase(), 
+                    message: error.message,
+                    stack: config.env === config.environments.development ? error.type : {}
+                } 
+            });
+
+        res.status(err.status).json({ errors });
+
+    } else {
+        res.status(err.status).json({
+            errors: [{
+                code: err.code,
+                message: err.isPublic ? err.message : httpStatus[err.status],
+                stack: config.env === config.environments.development ? err.stack : {}
+            }]
+        });
+    } 
+});
 
 export default app;

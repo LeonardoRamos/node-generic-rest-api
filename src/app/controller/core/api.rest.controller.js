@@ -1,6 +1,7 @@
 import { Joi } from 'express-validation';
 import httpStatus from 'http-status';
 import Sequelize from 'sequelize';
+import ApiError from '../../error/api.error';
 
 module.exports = class ApiRestController {
     
@@ -19,8 +20,13 @@ module.exports = class ApiRestController {
             const entityFound = await this.apiService.findBySlug(slug);
             
             if (!entityFound) {
-                const e = new Error('Entity not found');
-                e.status = httpStatus.NOT_FOUND;
+                const e = new ApiError(
+                    'No entity found for slug [' + slug + ']', 
+                    'ENTITY_NOT_FOUND_ERROR',
+                    httpStatus.NOT_FOUND,
+                    true
+                );
+                    
                 return next(e);
             }
             

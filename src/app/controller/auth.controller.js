@@ -23,7 +23,12 @@ async function login(req, res, next) {
         return res.json({ token });
     }
 
-    const err = new ApiError('Authentication error', httpStatus.UNAUTHORIZED, true);
+    const err = new ApiError(
+        'Wrong username or password', 
+        'AUTHENTICATION_ERROR', 
+        httpStatus.UNAUTHORIZED, 
+        true
+    );
  
     return next(err);
 }
