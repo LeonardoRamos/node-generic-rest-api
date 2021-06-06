@@ -54,7 +54,7 @@ app.use((err, req, res, next) => {
             code = 'AUTH_ERROR_' + err.code.toUpperCase();
         
         } else if (err.code) {
-            code = err.code.toUpperCase();
+            code = err.code.toUpperCase().split(' ').join('_');
         }
 
         const apiError = new ApiError(err.message, code, err.status, err.isPublic);
