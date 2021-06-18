@@ -51,7 +51,7 @@ app.use((err, req, res, next) => {
         let code = 'ERROR_CODE';
         
         if (err.name === 'UnauthorizedError') {
-            code = 'AUTH_ERROR_' + err.code.toUpperCase();
+            code = 'AUTH_ERROR_' + err.code.toUpperCase().split(' ').join('_');
         
         } else if (err.code) {
             code = err.code.toUpperCase().split(' ').join('_');
