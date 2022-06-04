@@ -11,7 +11,8 @@ module.exports = class BaseEntity {
         this.externalId = {
             type: Sequelize.STRING(32),
             allowNull: false,
-            unique: true
+            unique: true,
+            field: 'external_id'
         };
         this.active = {
             type: Sequelize.BOOLEAN,
