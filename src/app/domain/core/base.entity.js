@@ -8,7 +8,7 @@ module.exports = class BaseEntity {
             autoIncrement: true,
             primaryKey: true
         };
-        this.slug = {
+        this.externalId = {
             type: Sequelize.STRING(32),
             allowNull: false,
             unique: true

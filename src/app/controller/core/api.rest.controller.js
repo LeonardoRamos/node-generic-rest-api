@@ -8,20 +8,20 @@ module.exports = class ApiRestController {
     constructor(apiService) {
         this.apiService = apiService;
 
-        this.getBySlug = this.getBySlug.bind(this);
+        this.getByExternalId = this.getByExternalId.bind(this);
         this.insert = this.insert.bind(this);
         this.update = this.update.bind(this);
         this.list = this.list.bind(this);
         this.remove = this.remove.bind(this);
     }
 
-    async getBySlug(req, res, next, slug) {
+    async getByExternalId(req, res, next, externalId) {
         try {
-            const entityFound = await this.apiService.findBySlug(slug);
+            const entityFound = await this.apiService.findByExternalId(externalId);
             
             if (!entityFound) {
                 const e = new ApiError(
-                    'No entity found for slug [' + slug + ']', 
+                    'No entity found for externalId [' + externalId + ']', 
                     'ENTITY_NOT_FOUND_ERROR',
                     httpStatus.NOT_FOUND,
                     true
@@ -93,12 +93,12 @@ module.exports = class ApiRestController {
             update: {
                 body: {},
                 params: Joi.object({
-                    slug: Joi.string().hex().required(),
+                    externalId: Joi.string().hex().required(),
                 })
             },
             remove: {
                 params: Joi.object({
-                    slug: Joi.string().hex().required(),
+                    externalId: Joi.string().hex().required(),
                 })
             }
         };

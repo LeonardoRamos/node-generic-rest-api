@@ -8,14 +8,14 @@ module.exports = class ApiRestService {
     constructor(model) {
         this.model = model;
 
-        this.findBySlug = this.findBySlug.bind(this);
+        this.findByExternalId = this.findByExternalId.bind(this);
         this.save = this.save.bind(this);
         this.findAll = this.findAll.bind(this);
     }
 
-    async findBySlug(slug) {
+    async findByExternalId(externalId) {
         return await this.model.findOne({ 
-            where: { slug } 
+            where: { externalId } 
         });   
     }
 
@@ -32,7 +32,7 @@ module.exports = class ApiRestService {
     async save(entity) {
         const entityModel = this.model.build(entity);
         
-        entityModel.slug = uuidv4().split('-').join('').toUpperCase();
+        entityModel.externalId = uuidv4().split('-').join('');
         entityModel.insertDate = Sequelize.NOW;
         entityModel.updateDate = entityModel.insertDate;
 
