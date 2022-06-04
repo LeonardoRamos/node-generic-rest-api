@@ -20,7 +20,7 @@ router
         userController.insert);
 
 router
-    .route('/:slug')
+    .route('/:externalId')
     .get(
         expressJwt({ secret: config.jwtSecret }),
         userController.get)
@@ -35,6 +35,6 @@ router
         ], 
         userController.remove);
 
-router.param('slug', userController.getBySlug);
+router.param('externalId', userController.getByExternalId);
 
 export default router;

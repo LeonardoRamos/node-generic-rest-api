@@ -13,7 +13,7 @@ async function login(req, res, next) {
 
     if (user && bcrypt.compareSync(req.body.password, user.password)) {
         const token = jwt.sign({
-            slug: user.slug,
+            externalId: user.externalId,
             name: user.name,
             email: user.email,
             role: user.role,
