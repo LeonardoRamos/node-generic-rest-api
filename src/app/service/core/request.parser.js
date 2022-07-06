@@ -68,32 +68,20 @@ function parseSymbols(requestQuery) {
         requestQuery.filter = parseFilterOperators(requestQuery.filter);
     }
 
-    if (requestQuery.projection) {
-        requestQuery.projection = requestQuery.projection.split('[').join('').split(']').join('');
-    }
+    requestQuery = normalizeSymbol(requestQuery, 'projection');
+    requestQuery = normalizeSymbol(requestQuery, 'sum');
+    requestQuery = normalizeSymbol(requestQuery, 'avg');
+    requestQuery = normalizeSymbol(requestQuery, 'count');
+    requestQuery = normalizeSymbol(requestQuery, 'countDistinct');
+    requestQuery = normalizeSymbol(requestQuery, 'groupBy');
+    requestQuery = normalizeSymbol(requestQuery, 'sort');
 
-    if (requestQuery.sum) {
-        requestQuery.sum = requestQuery.sum.split('[').join('').split(']').join('');
-    }
+    return requestQuery;
+}
 
-    if (requestQuery.avg) {
-        requestQuery.avg = requestQuery.avg.split('[').join('').split(']').join('');
-    }
-
-    if (requestQuery.count) {
-        requestQuery.count = requestQuery.count.split('[').join('').split(']').join('');
-    }
-
-    if (requestQuery.countDistinct) {
-        requestQuery.countDistinct = requestQuery.countDistinct.split('[').join('').split(']').join('');
-    }
-
-    if (requestQuery.groupBy) {
-        requestQuery.groupBy = requestQuery.groupBy.split('[').join('').split(']').join('');
-    }
-
-    if (requestQuery.sort) {
-        requestQuery.sort = requestQuery.sort.split('[').join('').split(']').join('');
+function normalizeSymbol(requestQuery, symbol) {
+    if (requestQuery[symbol]) {
+        requestQuery[symbol] = requestQuery[symbol].split('[').join('').split(']').join('');
     }
     
     return requestQuery;
