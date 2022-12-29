@@ -12,8 +12,8 @@ const SortOrder = {
 SortOrder.getSortOrder = order => {
     let sortOrders = Object.keys(SortOrder);
     
-    for (const i of sortOrders) {
-        let sortOrder = SortOrder[i];
+    for (const so of sortOrders) {
+        let sortOrder = SortOrder[so];
 
         if (sortOrder.name.toUpperCase() === order.toUpperCase() 
             || sortOrder.order.toUpperCase() === order.toUpperCase()) {
