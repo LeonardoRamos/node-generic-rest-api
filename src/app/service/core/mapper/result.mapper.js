@@ -21,8 +21,8 @@ function mapResulRecords(result, requestQuery) {
 }
 
 function formatAggregateFields(row, aggregation, sqlFunction) {
-    for (let i = 0; i < aggregation[sqlFunction].length; i++) {
-        let splittedField = aggregation[sqlFunction][i].split('.');
+    for (const agreggationFunction of aggregation[sqlFunction]) {
+        let splittedField = agreggationFunction.split('.');
 
         let rootField = splittedField[0];
 
@@ -89,9 +89,9 @@ function mapResultMetadata(query, result, requestQuery) {
 
 function mapGroupCount(result) {
     let count = 0;
-    
-    for (let i = 0; i < result.count.length; i++) {
-        count += +result.count[i].count;
+
+    for (const resultCount of result.count) {
+        count += +resultCount.count;
     }
 
     return count;

@@ -49,8 +49,8 @@ function parseSortOrder(sort) {
     let orderFields = [];
     let fields = sort.split(',').map(attr => attr.trim());
 
-    for (let i = 0; i < fields.length; i++) {
-        let filterOrder = fields[i].split('=');
+    for (const field of fields) {
+        let filterOrder = field.split('=');
         orderFields.push({
             field: filterOrder[0].trim(),
             sortOrder: SortOrder.getSortOrder(filterOrder[1].trim())
@@ -113,32 +113,38 @@ function parseFilterExpressions(expressionString) {
     }
     
     let initialExpression = currentExpression;
-    let word = '';
-    
-    for (let i = 0; expressionString && i < expressionString.length; i++) {
-        
-        if (expressionString.charAt(i) !== '_') {
-            word += expressionString.charAt(i);
-            
-        } else {
-            let logicOperator = processOperator(expressionString, i);
 
-            if (logicOperator !== null) {
-                currentExpression.logicOperator = logicOperator;
-                currentExpression.filterField = parseFilterField(word.trim());
-                currentExpression = processNewExpressionNode(currentExpression);
-                
-                i += logicOperator.operator.length - 1;
-                word = '';
-            
-            } else {
+    if (expressionString) {
+        let word = '';
+        let i = 0;
+
+        while (i < expressionString.length) {
+        
+            if (expressionString.charAt(i) !== '_') {
                 word += expressionString.charAt(i);
+                
+            } else {
+                let logicOperator = processOperator(expressionString, i);
+    
+                if (logicOperator !== null) {
+                    currentExpression.logicOperator = logicOperator;
+                    currentExpression.filterField = parseFilterField(word.trim());
+                    currentExpression = processNewExpressionNode(currentExpression);
+                    
+                    i += logicOperator.operator.length - 1;
+                    word = '';
+                
+                } else {
+                    word += expressionString.charAt(i);
+                }
             }
+    
+            i++;
         }
     }
     
     currentExpression.filterField = parseFilterField(word.trim());
-    currentExpression = processNewExpressionNode(currentExpression);
+    processNewExpressionNode(currentExpression);
     
     return initialExpression;
 }
@@ -151,8 +157,9 @@ function parseFilterField(logicExpression) {
     }
     
     let word = '';
-    
-    for (let i = 0; i < logicExpression.length; i++) {
+    let i = 0;
+
+    while (i < logicExpression.length) {
       
         if (logicExpression.charAt(i) !== '|') {
             word += logicExpression.charAt(i);
@@ -166,6 +173,8 @@ function parseFilterField(logicExpression) {
             i += filterOperator.parseableOperator.length - 1;
             word = '';
         }
+
+        i++;
     }
     
     filterField.value = word.trim();

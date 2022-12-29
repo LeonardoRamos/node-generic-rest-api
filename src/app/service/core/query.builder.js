@@ -97,19 +97,19 @@ function buildAggregations(requestQuery, model, nestedModels) {
 function buildFunctionProjection(functionFields, aggregateFunction, model, nestedModels) {
     let aggregation = [];
 
-    for (let i = 0; i < functionFields.length; i++) {
-        let nestedModel = getFieldModel(model, nestedModels, functionFields[i]);
-        let columnField = getLiteralField(functionFields[i], nestedModel);
+    for (const functionField of functionFields) {
+        let nestedModel = getFieldModel(model, nestedModels, functionField);
+        let columnField = getLiteralField(functionField, nestedModel);
 
         if (aggregateFunction.name === AggregateFunction.GROUP_BY.name) {
             aggregation.push(
-                [ Sequelize.literal(columnField), functionFields[i] ]
+                [ Sequelize.literal(columnField), functionField ]
             ); 
 
         } else {
             let sqlFunctionCompiled = _.template(aggregateFunction.sqlFunctionTemplate);
             aggregation.push(
-                [ Sequelize.literal(sqlFunctionCompiled({ columnField })), functionFields[i] ]
+                [ Sequelize.literal(sqlFunctionCompiled({ columnField })), functionField ]
             );            
         }
     }
@@ -127,10 +127,10 @@ function buildProjections(projection, modelAlias = null) {
 
     let projectionModels = {};
 
-    for (let i = 0; i < projections.length; i++) {
-        let modelName = getFieldModelName(projections[i]);
+    for (const projection of projections) {
+        let modelName = getFieldModelName(projection);
         projectionModels[modelName] = projectionModels[modelName] || [];
-        projectionModels[modelName].push(getSignificantField(projections[i]));
+        projectionModels[modelName].push(getSignificantField(projection));
     }
 
     if (projectionModels[modelAlias]) {
@@ -147,16 +147,16 @@ function buildGroupBy(groupBy, model, nestedModels) {
     let groupByFields = requestParser.parseSeletor(groupBy);
     let query = {};
 
-    for (let i = 0; i < groupByFields.length; i++) {
-        let nestedModel = getNestedModel(nestedModels, groupByFields[i]);
+    for (const groupByField of groupByFields) {
+        let nestedModel = getNestedModel(nestedModels, groupByField);
 
         query.group = query.group || [];
 
         if (nestedModel === null) {
-            query.group.push([ getLiteralLastField(groupByFields[i], model) ]);
+            query.group.push([ getLiteralLastField(groupByField, model) ]);
         
         } else {
-            query.group.push([ getLiteralLastField(groupByFields[i], nestedModel.model) ]);
+            query.group.push([ getLiteralLastField(groupByField, nestedModel.model) ]);
         }
     }
 
@@ -167,8 +167,8 @@ function buildOrder(sort, nestedModels, model) {
     let orderFields = requestParser.parseSortOrder(sort);
     let query = {};
 
-    for (let i = 0; i < orderFields.length; i++) {
-        let splittedField = orderFields[i].field.split('.');
+    for (const orderField of orderFields) {
+        let splittedField = orderField.field.split('.');
         let field = splittedField[splittedField.length - 1];
 
         query.order = query.order || [];
@@ -183,12 +183,12 @@ function buildOrder(sort, nestedModels, model) {
             }
             
             order.push(getModelColumnField(field, lastNestedModel.model));
-            order.push(orderFields[i].sortOrder.order)
+            order.push(orderField.sortOrder.order)
 
             query.order.push([ order ]);
 
         } else {
-            query.order.push([ getModelColumnField(field, model), orderFields[i].sortOrder.order ]);
+            query.order.push([ getModelColumnField(field, model), orderField.sortOrder.order ]);
         }
     }
 
@@ -202,30 +202,18 @@ function buildWhere(filter, model, nestedModels) {
     while (currentExpression !== null && Object.keys(currentExpression).length > 0) {
         
         if (currentExpression.filterField !== null) {
-            let fieldModel = model;
             query.where = query.where || {};
 
             if (currentExpression.logicOperator && LogicOperator.OR.name === currentExpression.logicOperator.name) {
                 let conjunctionQuery = [];
 
-                do {
-                    fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
-                    conjunctionQuery.push(buildWhereCondition(currentExpression.filterField, fieldModel));
-                    currentExpression = currentExpression.filterExpression;
-                
-                } while (currentExpression !== null && currentExpression.logicOperator 
-                        && LogicOperator.OR.name === currentExpression.logicOperator.name);
-                
-                if (currentExpression !== null && currentExpression.filterField !== null) {
-                    fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
-                    conjunctionQuery.push(buildWhereCondition(currentExpression.filterField, fieldModel));
-                }
+                getOrRestrictions(conjunctionQuery, model, nestedModels, currentExpression);
 
                 query.where[Op.and] = query.where[Op.and] || [];
                 query.where[Op.and].push({ [Op.or]: conjunctionQuery });
 
             } else {
-                fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
+                let fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
                 query.where[Op.and] = query.where[Op.and] || [];
                 query.where[Op.and].push(buildWhereCondition(currentExpression.filterField, fieldModel)); 
             }
@@ -235,6 +223,21 @@ function buildWhere(filter, model, nestedModels) {
     }
 
     return query;
+}
+
+function getOrRestrictions(conjunctionQuery, model, nestedModels, currentExpression) {
+    do {
+        let fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
+        conjunctionQuery.push(buildWhereCondition(currentExpression.filterField, fieldModel));
+        currentExpression = currentExpression.filterExpression;
+    
+    } while (currentExpression !== null && currentExpression.logicOperator 
+            && LogicOperator.OR.name === currentExpression.logicOperator.name);
+    
+    if (currentExpression !== null && currentExpression.filterField !== null) {
+        let fieldModel = getFieldModel(model, nestedModels, currentExpression.filterField.field);
+        conjunctionQuery.push(buildWhereCondition(currentExpression.filterField, fieldModel));
+    }
 }
 
 function buildWhereCondition(filterField, fieldModel) {
@@ -315,9 +318,7 @@ function getWhereField(fullPathField, field, fieldModel) {
     let modelFields = Object.keys(fieldModel.fieldRawAttributesMap);
     let originalColumnField = '';
 
-    for (let i = 0; i < modelFields.length; i++) {
-        let modelField = modelFields[i];
-
+    for (const modelField of modelFields) {
         if (fieldModel.fieldRawAttributesMap[modelField].fieldName === field) {
             originalColumnField = modelField;
             break;
@@ -394,9 +395,7 @@ function getModelColumnField(fullPathField, fieldModel) {
     let fieldName = splittedField[splittedField.length - 1];
     let columnField = null;
 
-    for (let i = 0; i < modelFields.length; i++) {
-        let modelField = modelFields[i];
-
+    for (const modelField of modelFields) {
         if (fieldModel.fieldRawAttributesMap[modelField].fieldName === fieldName) {
             columnField = modelField;
             break;
