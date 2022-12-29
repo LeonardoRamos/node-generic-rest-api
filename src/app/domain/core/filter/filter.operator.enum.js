@@ -58,8 +58,8 @@ const FilterOperator = {
 FilterOperator.getFilterOperator = operator => {
     let filterOperators = Object.keys(FilterOperator);
     
-    for (const i of filterOperators) {
-        let filterOperator = FilterOperator[i];
+    for (const op of filterOperators) {
+        let filterOperator = FilterOperator[op];
 
         if (filterOperator.name.toUpperCase() === operator.toUpperCase() 
             || filterOperator.operatorAlias.toUpperCase() === operator.toUpperCase()
