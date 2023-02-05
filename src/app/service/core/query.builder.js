@@ -6,7 +6,7 @@ import Sequelize from 'sequelize';
 import _ from 'lodash';
 
 const Op = Sequelize.Op;
-const ROOT_MODEL = '.'; 
+const ROOT_MODEL = '_.'; 
 
 function buildQuery(model, requestQuery) {
     requestQuery = requestParser.parseSymbols(requestQuery);
