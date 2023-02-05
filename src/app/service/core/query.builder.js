@@ -6,6 +6,7 @@ import Sequelize from 'sequelize';
 import _ from 'lodash';
 
 const Op = Sequelize.Op;
+const ROOT_MODEL = '.'; 
 
 function buildQuery(model, requestQuery) {
     requestQuery = requestParser.parseSymbols(requestQuery);
@@ -34,38 +35,50 @@ function buildQuery(model, requestQuery) {
     return query;
 }
 
-function buildIncludes(requestQuery, model, rootModel = model, query = {}) {
-    if (model.associations) {
-        Object.keys(model.associations).forEach((key) => {
-            if (model.associations[key].target) {
-                query.include = [];
+function buildIncludes(requestQuery, model, rootModel = model) {
+    let query = {};
+  
+    if (!model.associations)  {
+        return query;
+    }
+  
+    const includes = [];
+    const stack = [{ model, key: null }];
+  
+    while (stack.length > 0) {
+        const { model, key } = stack.pop();
+  
+        Object.keys(model.associations).forEach((childKey) => {
+            
+            const association = model.associations[childKey];
+            if (!association.target) {
+                return;
+            }
+  
+            let join = { model: association.target, as: childKey };
+            if (!requestParser.hasValidAggregateFunction(requestQuery)) {
+                join = { ...join, ...buildProjections(requestQuery.projection, childKey) };
+            }
+            
+            setJoinIncludes(key, includes, join);
 
-                let associationInclude = {
-                    model: model.associations[key].target,
-                    as: key,
-                };
-
-                if (requestParser.hasValidAggregateFunction(requestQuery)) {
-                    associationInclude.attributes = [];
-
-                } else {
-                    associationInclude = { ...associationInclude, ...buildProjections(requestQuery.projection, key) };
-                }
-
-                query.include.push(associationInclude);
-
-                if (model.associations[key].target.name !== rootModel.name) {
-                    let lastIndex = query.include.length - 1;
-                    let currentJoin = query.include[lastIndex];    
-                    let childJoin = buildIncludes(requestQuery, model.associations[key].target, rootModel, currentJoin);
-                    
-                    query.include[lastIndex] = { ...currentJoin, ...childJoin };
-                }
+            if (association.target.name !== rootModel.name)  {
+                stack.push({ model: association.target, key: childKey });
             }
         });
     }
-
+  
+    query.include = includes;
     return query;
+}
+
+function setJoinIncludes(key, includes, join) {
+    if (key) {
+        includes[includes.length - 1].include = includes[includes.length - 1].include || [];
+        includes[includes.length - 1].include.push(join);
+    } else {
+        includes.push(join);
+    }
 }
 
 function buildAggregations(requestQuery, model, nestedModels) {
@@ -117,7 +130,7 @@ function buildFunctionProjection(functionFields, aggregateFunction, model, neste
     return aggregation;
 }
 
-function buildProjections(projection, modelAlias = null) {
+function buildProjections(projection, modelAlias = ROOT_MODEL) {
     let projections = requestParser.parseSeletor(projection);
     let query = {};
 
@@ -455,7 +468,7 @@ function getFieldModelName(field) {
     let fields = field.split('.');
     
     if (fields.length === 1) {
-        return null;
+        return ROOT_MODEL;
     }
 
     return fields[fields.length - 2];

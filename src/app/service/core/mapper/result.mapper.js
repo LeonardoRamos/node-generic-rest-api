@@ -40,23 +40,30 @@ function formatAggregateFields(row, aggregation, sqlFunction) {
 }
 
 function hideFields(row) {
-    Object.keys(row).forEach((field) => {
-        if (field === 'id' || field.startsWith('id_') || row[field] === null) {
-            delete row[field];
+    let queue = [row];
+    
+    while (queue.length > 0) {
+        let current = queue.shift();
         
-        } else if (!AggregateFunction.isAggregationFunction(field)) {
-            let fieldValue = row[field];
+        Object.keys(current).forEach((field) => {
             
-            if (typeof fieldValue === 'object') {
-                hideFields(fieldValue);
-        
-            } else if (Array.isArray(fieldValue)) {
-                fieldValue.forEach((nestedRow) => {
-                    hideFields(nestedRow);
-                });
+            if (field === 'id' || field.startsWith('id_') || current[field] === null) {
+                delete current[field];
+            
+            } else if (!AggregateFunction.isAggregationFunction(field)) {
+                let fieldValue = current[field];
+                
+                if (typeof fieldValue === 'object') {
+                    queue.push(fieldValue);
+                
+                } else if (Array.isArray(fieldValue)) {
+                    fieldValue.forEach((nestedRow) => {
+                        queue.push(nestedRow);
+                    });
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 function mapResultMetadata(query, result, requestQuery) {
