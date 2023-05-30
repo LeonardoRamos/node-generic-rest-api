@@ -1,5 +1,5 @@
 import { Joi } from 'express-validation';
-import ApiRestController from './core/api.rest.controller';
+import { ApiRestController } from 'generic-rest-express-lib';
 import UserService from '../service/user.service';
 
 const userService = new UserService();

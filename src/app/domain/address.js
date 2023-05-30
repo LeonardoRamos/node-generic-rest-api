@@ -1,19 +1,18 @@
-import Sequelize from 'sequelize';
-import BaseEntity from './core/base.entity';
+import { BaseEntity, db } from 'generic-rest-express-lib';
 
 class AddressDefinition extends BaseEntity {
     constructor() {
         super();
         
         this.street = {
-            type: Sequelize.STRING
+            type: db.Sequelize.STRING
         };
         this.streetNumber = {
-            type: Sequelize.STRING,
+            type: db.Sequelize.STRING,
             field: 'street_number'
         };
         this.state = {
-            type: Sequelize.STRING
+            type: db.Sequelize.STRING
         };
     }
 }
