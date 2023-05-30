@@ -1,8 +1,7 @@
 import '@babel/polyfill';
-import config from './config/config';
+import { config } from 'generic-rest-express-lib';
 import app from './config/express';
-
-Promise = require('bluebird'); 
+import './config/database';
 
 if (require.main === module) {
     app.listen(config.port, () => {

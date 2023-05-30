@@ -1,12 +1,11 @@
-import Sequelize from 'sequelize';
-import BaseEntity from './core/base.entity';
+import { BaseEntity, db } from 'generic-rest-express-lib';
 
 class CountryDefinition extends BaseEntity {
     constructor() {
         super();
         
         this.name = {
-            type: Sequelize.STRING
+            type: db.Sequelize.STRING
         };
     }
 }

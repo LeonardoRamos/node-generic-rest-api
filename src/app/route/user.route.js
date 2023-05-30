@@ -1,4 +1,4 @@
-import config from '../config/config';
+import { config } from 'generic-rest-express-lib';
 import express from 'express';
 import expressJwt from 'express-jwt';
 import { validate } from 'express-validation';

@@ -1,13 +1,12 @@
 import bcrypt from 'bcrypt';
-import ApiRestService from './core/api.rest.service';
-import db from '../config/sequelize';
+import { ApiRestService, db } from 'generic-rest-express-lib';
 
 const User = db.User;
 
 module.exports = class UserService extends ApiRestService {
     
     constructor() {
-        super(User);
+        super();
 
         this.save = this.save.bind(this);
     }
