@@ -1,6 +1,6 @@
-import { BaseEntity, db } from 'generic-rest-express-lib';
+import { BaseApiEntity, db } from 'generic-rest-express-lib';
 
-class AddressDefinition extends BaseEntity {
+class AddressDefinition extends BaseApiEntity {
     constructor() {
         super();
         
