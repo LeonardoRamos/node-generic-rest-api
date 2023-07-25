@@ -1,6 +1,7 @@
 import { BaseApiEntity, db } from 'generic-rest-express-lib';
 
 class AddressDefinition extends BaseApiEntity {
+    
     constructor() {
         super();
         
@@ -15,6 +16,7 @@ class AddressDefinition extends BaseApiEntity {
             type: db.Sequelize.STRING
         };
     }
+    
 }
 
 const addressDefinition = new AddressDefinition();

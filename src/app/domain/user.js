@@ -1,6 +1,7 @@
 import { BaseApiEntity, db } from 'generic-rest-express-lib';
 
 class UserDefinition extends BaseApiEntity { 
+
     constructor() {
         super();
         
@@ -21,6 +22,7 @@ class UserDefinition extends BaseApiEntity {
             allowNull: false
         };
     }
+    
 }
 
 const userDefinition = new UserDefinition();

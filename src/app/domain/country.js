@@ -1,6 +1,7 @@
 import { BaseApiEntity, db } from 'generic-rest-express-lib';
 
 class CountryDefinition extends BaseApiEntity {
+
     constructor() {
         super();
         
@@ -8,6 +9,7 @@ class CountryDefinition extends BaseApiEntity {
             type: db.Sequelize.STRING
         };
     }
+    
 }
 
 const countryDefinition = new CountryDefinition();

@@ -6,7 +6,7 @@ const User = db.User;
 module.exports = class UserService extends ApiRestService {
     
     constructor() {
-        super();
+        super(User);
 
         this.save = this.save.bind(this);
     }
